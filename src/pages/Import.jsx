@@ -16,7 +16,7 @@ const PDF_PASSWORD_HINTS = {
 
 export default function ImportPage() {
   const state = useStore();
-  const bankAccounts = state.accounts.filter((a) => a.type === 'bank');
+  const bankAccounts = state.accounts.filter((a) => a.type === 'bank' || a.type === 'card');
   const [accountId, setAccountId] = useState('');
   const [preview, setPreview] = useState(null); // {source, txns}
   const [error, setError] = useState('');

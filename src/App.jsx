@@ -8,6 +8,8 @@ import Tranches from './pages/Tranches.jsx';
 import Manish from './pages/Manish.jsx';
 import Accounts from './pages/Accounts.jsx';
 import Analysis from './pages/Analysis.jsx';
+import LoansCards from './pages/LoansCards.jsx';
+import Save from './pages/Save.jsx';
 
 export default function App() {
   const state = useStore();
@@ -28,6 +30,8 @@ export default function App() {
               {unreviewed > 0 && <span className="badge-count">{unreviewed}</span>}
             </NavLink>
             <NavLink to="/analysis">CA Analysis</NavLink>
+            <NavLink to="/save">Save More</NavLink>
+            <NavLink to="/loans-cards">Loans & Cards</NavLink>
             <NavLink to="/tranches">Investor Tranches</NavLink>
             <NavLink to="/manish">Manish Ledger</NavLink>
             <NavLink to="/rules">Rules</NavLink>
@@ -40,6 +44,8 @@ export default function App() {
             <Route path="/import" element={<ImportPage />} />
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/analysis" element={<Analysis />} />
+            <Route path="/save" element={<Save />} />
+            <Route path="/loans-cards" element={<LoansCards />} />
             <Route path="/tranches" element={<Tranches />} />
             <Route path="/manish" element={<Manish />} />
             <Route path="/rules" element={<Rules />} />

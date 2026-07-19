@@ -29,6 +29,13 @@ Think of it as the daily working file a good CA would keep for you:
   paste them in; each becomes a transaction, auto-routed to the right account by last-4 digits.
 - **Similarity suggestions** — untagged transactions get a one-click suggested head from the most
   similar transaction you've already tagged (rules → similarity ladder; LLM rung on the roadmap).
+- **Loans & Cards** — register credit cards (limit, due day, outstanding — computed from imported
+  card statements or entered manually) and loans (EMI, rate, outstanding); recurring NACH/EMI
+  debits found in statements are offered for one-click registration.
+- **Save More** — quantified, CA-style guidance computed from your own data: card utilisation and
+  due-date warnings, EMI-to-income ratio (FOIR), expensive-debt prepayment candidates, bounce and
+  bank-charge leakage, subscription burn, savings rate, idle-balance sweep suggestions, and cash
+  discipline flags.
 
 ## Run it
 

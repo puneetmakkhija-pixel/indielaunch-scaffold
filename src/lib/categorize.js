@@ -30,6 +30,7 @@ export const HEADS = [
   { name: 'Investments (Personal)', scope: 'personal' },
   { name: 'Cash Withdrawal', scope: null },
   { name: 'Self Transfer', scope: null },
+  { name: 'Card Bill Payment', scope: null },
   { name: 'Other', scope: null },
 ];
 
@@ -84,6 +85,9 @@ export const DEFAULT_RULES = [
   { pattern: 'ECS DR', head: 'EMI & Loans', scope: 'personal' },
   { pattern: 'SMS CHRG', head: 'Bank Charges', scope: 'business' },
   { pattern: 'AMB CHRG', head: 'Bank Charges', scope: 'business' },
+  { pattern: 'CRED CLUB', head: 'Card Bill Payment', scope: null },
+  { pattern: 'CC PAYMENT', head: 'Card Bill Payment', scope: null },
+  { pattern: 'CREDIT CARD PAYMENT', head: 'Card Bill Payment', scope: null },
   { pattern: 'MANISH', head: 'Manish Transfer', scope: 'business' },
 ].map((r, i) => ({ id: 'default-' + i, builtin: true, ...r }));
 

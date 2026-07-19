@@ -14,6 +14,7 @@ const emptyState = {
   rules: DEFAULT_RULES,
   tranches: [],
   manishClaims: [],
+  loans: [],
 };
 
 function load() {
@@ -204,6 +205,18 @@ export function updateManishClaim(id, patch) {
 
 export function removeManishClaim(id) {
   setState((s) => ({ manishClaims: s.manishClaims.filter((c) => c.id !== id) }));
+}
+
+export function addLoan(loan) {
+  setState((s) => ({ loans: [...s.loans, { id: uid(), ...loan }] }));
+}
+
+export function updateLoan(id, patch) {
+  setState((s) => ({ loans: s.loans.map((l) => (l.id === id ? { ...l, ...patch } : l)) }));
+}
+
+export function removeLoan(id) {
+  setState((s) => ({ loans: s.loans.filter((l) => l.id !== id) }));
 }
 
 export function exportAll() {
