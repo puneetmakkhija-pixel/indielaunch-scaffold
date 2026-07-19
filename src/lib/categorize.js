@@ -2,6 +2,9 @@
 // Scope can always be overridden per-transaction.
 export const HEADS = [
   { name: 'Investor Tranche In', scope: 'business', credit: true },
+  { name: 'Salary (BuddyLoan)', scope: 'personal', credit: true },
+  { name: 'DSA Commission (BuddyLoan)', scope: 'business', credit: true },
+  { name: 'Sub-DSA Investment', scope: 'business' },
   { name: 'Revenue / Client Payment', scope: 'business', credit: true },
   { name: 'Refund / Reversal', scope: null, credit: true },
   { name: 'Manish Transfer', scope: 'business' },
@@ -94,7 +97,13 @@ export const DEFAULT_RULES = [
   { pattern: 'SWEEP TRANSFER TO', head: 'Self Transfer', scope: null },
   { pattern: 'SWEEP TRF FROM', head: 'Self Transfer', scope: null },
   { pattern: 'FD PREMAT PROCEEDS', head: 'Self Transfer', scope: null },
-  { pattern: 'BVALUE SERVICES', head: 'Revenue / Client Payment', scope: 'business' },
+  // BVALUE = BuddyLoan: salary when it lands in the personal IndusInd account,
+  // DSA commission when it lands in Cube Finserve's Kotak account.
+  { pattern: 'BVALUE', accountId: 'indusind', head: 'Salary (BuddyLoan)', scope: 'personal' },
+  { pattern: 'BVALUE SERVICES', head: 'DSA Commission (BuddyLoan)', scope: 'business' },
+  // Udyami Fin + Sarabjeet = one sub-DSA entity; deployments of Manish's money.
+  { pattern: 'UDYAMI FIN', head: 'Sub-DSA Investment', scope: 'business' },
+  { pattern: 'SARABJEET', head: 'Sub-DSA Investment', scope: 'business' },
   { pattern: 'ETAX GSTN', head: 'GST / Taxes', scope: 'business' },
   { pattern: 'JDS ENTERPRISES', head: 'Vendor Payment', scope: 'business' },
   { pattern: 'AEROCHAP', head: 'Vendor Payment', scope: 'business' },
@@ -108,10 +117,13 @@ export const DEFAULT_RULES = [
   { pattern: 'DEEPIKA MAKHIJA', head: 'Family & Gifts', scope: 'personal' },
 ].map((r, i) => ({ id: 'default-' + i, builtin: true, ...r }));
 
-// Apply the first matching rule to a transaction. Returns {head, scope} or null.
-export function applyRules(narration, rules) {
+// Apply the first matching rule to a transaction. Rules may be scoped to one
+// account via rule.accountId (e.g. BVALUE = salary only in the IndusInd
+// account). Returns {head, scope} or null.
+export function applyRules(narration, rules, accountId = null) {
   const hay = (narration || '').toUpperCase();
   for (const r of rules) {
+    if (r.accountId && r.accountId !== accountId) continue;
     if (r.pattern && hay.includes(r.pattern.toUpperCase())) {
       return { head: r.head, scope: r.scope ?? defaultScopeForHead(r.head), ruleId: r.id };
     }

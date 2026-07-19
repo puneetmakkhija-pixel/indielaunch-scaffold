@@ -13,7 +13,7 @@ const emptyState = {
     { id: 'amex-reserve', label: 'Amex Platinum Reserve', bank: 'American Express', last4: '1004', email: 'puneetmakkhija@gmail.com', type: 'card', limit: 586000, dueDay: 10 },
     { id: 'sbi-paytm', label: 'Paytm SBI Card', bank: 'SBI Card', last4: '7209', email: 'puneet.borntolead@gmail.com', type: 'card' },
     { id: 'indusind-cc2', label: 'IndusInd Card (second)', bank: 'IndusInd', last4: '5984', email: 'puneet.borntolead@gmail.com', type: 'card' },
-    { id: 'kotak', label: 'Kotak', bank: 'Kotak', last4: '', email: 'puneetmakkhija@gmail.com', type: 'bank' },
+    { id: 'kotak', label: 'Kotak — Cube Finserve (Manish co., DSA of BuddyLoan)', bank: 'Kotak', last4: '4444', email: 'puneetmakkhija@gmail.com', type: 'bank' },
   ],
   transactions: [],
   rules: DEFAULT_RULES,
@@ -119,7 +119,7 @@ export function importTransactions(accountId, parsed, source) {
         continue;
       }
       existing.add(h);
-      const match = applyRules(t.narration, s.rules);
+      const match = applyRules(t.narration, s.rules, t.accountId);
       if (match) {
         t.head = match.head;
         t.scope = match.scope;
@@ -165,7 +165,7 @@ export function tagTransaction(id, { head, scope, rememberPattern }) {
     const retagged = rememberPattern
       ? transactions.map((t) => {
           if (t.reviewed || t.head) return t;
-          const m = applyRules(t.narration, rules);
+          const m = applyRules(t.narration, rules, t.accountId);
           return m ? { ...t, head: m.head, scope: m.scope, autoTagged: true } : t;
         })
       : transactions;

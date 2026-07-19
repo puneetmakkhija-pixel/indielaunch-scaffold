@@ -10,7 +10,7 @@
     { "id": "hdfc", "label": "HDFC Savings (primary)", "bank": "HDFC", "last4": "9780", "email": "puneetmakkhija@gmail.com", "type": "bank" },
     { "id": "indusind", "label": "IndusInd Select (personal)", "bank": "IndusInd", "last4": "6786", "email": "puneetmakkhija@gmail.com", "type": "bank" },
     { "id": "indusind-cc", "label": "IndusInd Credit Card", "bank": "IndusInd", "last4": "8829", "email": "puneetmakkhija@gmail.com", "type": "card" },
-    { "id": "kotak", "label": "Kotak", "bank": "Kotak", "last4": "", "email": "puneetmakkhija@gmail.com", "type": "bank" },
+    { "id": "kotak", "label": "Kotak — Cube Finserve (Manish's co., DSA of BuddyLoan)", "bank": "Kotak", "last4": "4444", "email": "puneetmakkhija@gmail.com", "type": "bank" },
     { "id": "au-cube", "label": "AU SFB — Cube Fin India Pvt Ltd (FROZEN/closure notice)", "bank": "AU Small Finance", "last4": "8092", "email": "puneetmakkhija@gmail.com", "type": "bank" },
     { "id": "amex-plat", "label": "Amex Platinum charge (fee ₹77,882 OVERDUE since 11-Jul)", "bank": "American Express", "last4": "1008", "email": "puneetmakkhija@gmail.com", "type": "card", "dueDay": 11, "outstanding": 77882 },
     { "id": "amex-reserve", "label": "Amex Platinum Reserve", "bank": "American Express", "last4": "1004", "email": "puneetmakkhija@gmail.com", "type": "card", "limit": 586000, "dueDay": 10, "outstanding": 465493.53 },

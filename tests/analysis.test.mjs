@@ -83,6 +83,19 @@ test('bounce, EMI and recurring detection', () => {
   assert.equal(netflix.count, 2);
 });
 
+test('account-scoped rules: BVALUE is salary in IndusInd, commission in Kotak', async () => {
+  const { applyRules, DEFAULT_RULES } = await import('../src/lib/categorize.js');
+  const indus = applyRules('N/HDFCH00770737490/HDFC0000240/BVALUE SERVICES PVT', DEFAULT_RULES, 'indusind');
+  assert.equal(indus.head, 'Salary (BuddyLoan)');
+  assert.equal(indus.scope, 'personal');
+  const kotak = applyRules('IFT-BVALUE SERVICES PRIVATE L-FCM-260702NS2MJ2', DEFAULT_RULES, 'kotak');
+  assert.equal(kotak.head, 'DSA Commission (BuddyLoan)');
+  const udyami = applyRules('SentIMPS618616501765UDYAMI FIN/AUBLX4373/KKBKTrans', DEFAULT_RULES, 'kotak');
+  assert.equal(udyami.head, 'Sub-DSA Investment');
+  const sarab = applyRules('MB: SENT TO SARABJEET SINGH', DEFAULT_RULES, 'kotak');
+  assert.equal(sarab.head, 'Sub-DSA Investment');
+});
+
 test('suggestTag: untagged transaction inherits head of similar tagged one', () => {
   const tagged = [
     T({ date: '2026-06-01', narration: 'UPI-SWIGGY LIMITED-swiggy@axb-9921', head: 'Food & Dining', scope: 'personal' }),

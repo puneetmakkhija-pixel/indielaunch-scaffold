@@ -50,6 +50,8 @@ Re-importing an overlapping statement never duplicates rows.
   pattern: string,            // case-insensitive substring matched on narration
   head: string,
   scope: 'business' | 'personal' | null,
+  accountId?: Account.id,     // scope the rule to one account (e.g. BVALUE =
+                              // salary in IndusInd, DSA commission in Kotak)
   builtin?: boolean,          // pre-loaded Indian merchant rules
 }
 ```
