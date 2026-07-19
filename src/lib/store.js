@@ -9,6 +9,8 @@ const emptyState = {
     { id: 'hdfc', label: 'HDFC Savings (primary)', bank: 'HDFC', last4: '9780', email: 'puneetmakkhija@gmail.com', type: 'bank' },
     { id: 'indusind', label: 'IndusInd Select (personal)', bank: 'IndusInd', last4: '6786', email: 'puneetmakkhija@gmail.com', type: 'bank' },
     { id: 'indusind-cc', label: 'IndusInd Credit Card', bank: 'IndusInd', last4: '8829', email: 'puneetmakkhija@gmail.com', type: 'card' },
+    { id: 'amex-plat', label: 'Amex Platinum charge', bank: 'American Express', last4: '1008', email: 'puneetmakkhija@gmail.com', type: 'card', dueDay: 11 },
+    { id: 'amex-reserve', label: 'Amex Platinum Reserve', bank: 'American Express', last4: '1004', email: 'puneetmakkhija@gmail.com', type: 'card', limit: 586000, dueDay: 10 },
     { id: 'kotak', label: 'Kotak', bank: 'Kotak', last4: '', email: 'puneetmakkhija@gmail.com', type: 'bank' },
   ],
   transactions: [],

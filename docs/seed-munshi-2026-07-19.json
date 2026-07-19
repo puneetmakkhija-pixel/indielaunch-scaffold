@@ -12,8 +12,8 @@
     { "id": "indusind-cc", "label": "IndusInd Credit Card", "bank": "IndusInd", "last4": "8829", "email": "puneetmakkhija@gmail.com", "type": "card" },
     { "id": "kotak", "label": "Kotak", "bank": "Kotak", "last4": "", "email": "puneetmakkhija@gmail.com", "type": "bank" },
     { "id": "au-cube", "label": "AU SFB — Cube Fin India Pvt Ltd (FROZEN/closure notice)", "bank": "AU Small Finance", "last4": "8092", "email": "puneetmakkhija@gmail.com", "type": "bank" },
-    { "id": "amex-plat", "label": "Amex Platinum (OVERDUE as of 18-Jul)", "bank": "American Express", "last4": "1008", "email": "puneetmakkhija@gmail.com", "type": "card", "dueDay": "" },
-    { "id": "amex-2", "label": "Amex (second card ending 81016)", "bank": "American Express", "last4": "1016", "email": "puneetmakkhija@gmail.com", "type": "card" }
+    { "id": "amex-plat", "label": "Amex Platinum charge (fee ₹77,882 OVERDUE since 11-Jul)", "bank": "American Express", "last4": "1008", "email": "puneetmakkhija@gmail.com", "type": "card", "dueDay": 11, "outstanding": 77882 },
+    { "id": "amex-reserve", "label": "Amex Platinum Reserve", "bank": "American Express", "last4": "1004", "email": "puneetmakkhija@gmail.com", "type": "card", "limit": 586000, "dueDay": 10, "outstanding": 465493.53 }
   ],
   "loans": [
     { "id": "yes-loan-1", "lender": "Yes Bank (Race Div) — UMRN …11341", "outstanding": 0, "emi": 36170, "rate": 0, "emiDay": 15, "notes": "NACH from HDFC 9780 on the 15th; confirmed Apr/May/Jul 2026. Fill outstanding & rate from the sanction letter." },
