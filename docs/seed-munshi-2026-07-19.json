@@ -1,4 +1,8 @@
 {
+  "emails": [
+    { "id": "email-primary", "address": "puneetmakkhija@gmail.com", "label": "Personal" },
+    { "id": "email-business", "address": "info@zeroerrorfilings.com", "label": "Business (Zero Error Filings)" }
+  ],
   "accounts": [
     { "id": "cash", "label": "Cash in hand", "bank": "Cash", "last4": "", "email": "", "type": "cash" },
     { "id": "hdfc", "label": "HDFC Savings (primary)", "bank": "HDFC", "last4": "9780", "email": "puneetmakkhija@gmail.com", "type": "bank" },

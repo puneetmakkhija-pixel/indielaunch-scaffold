@@ -1,5 +1,58 @@
 import { useState } from 'react';
-import { useStore, addAccount, removeAccount, exportAll, importAll } from '../lib/store.js';
+import { useStore, addAccount, removeAccount, addEmail, removeEmail, exportAll, importAll } from '../lib/store.js';
+
+function EmailRegistry({ emails, accounts }) {
+  const [form, setForm] = useState({ address: '', label: '' });
+  function add() {
+    if (!form.address.trim()) return;
+    addEmail(form);
+    setForm({ address: '', label: '' });
+  }
+  return (
+    <div className="card">
+      <h2 style={{ marginTop: 0 }}>Your email IDs</h2>
+      <p className="muted" style={{ marginBottom: '0.75rem' }}>
+        Register every email ID where banks send you statements and alerts — personal, business,
+        family. Each account below links to one of them, so you always know which inbox feeds which
+        account.
+      </p>
+      <div className="row" style={{ marginBottom: emails.length ? '0.75rem' : 0 }}>
+        <input placeholder="email@example.com" type="email" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} style={{ minWidth: 220 }} />
+        <input placeholder="Label — e.g. Business" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} style={{ width: 160 }} />
+        <button onClick={add}>Add email ID</button>
+      </div>
+      {emails.length > 0 && (
+        <table>
+          <thead>
+            <tr><th>Email ID</th><th>Label</th><th className="num">Linked accounts</th><th></th></tr>
+          </thead>
+          <tbody>
+            {emails.map((e) => {
+              const linked = accounts.filter((a) => (a.email || '').toLowerCase() === e.address.toLowerCase()).length;
+              return (
+                <tr key={e.id}>
+                  <td>{e.address}</td>
+                  <td className="muted">{e.label || '—'}</td>
+                  <td className="num">{linked}</td>
+                  <td>
+                    <button
+                      className="danger small"
+                      onClick={() => {
+                        if (linked === 0 || confirm(linked + ' account(s) link to this email. Remove it from the registry anyway? (Accounts keep their link.)')) removeEmail(e.id);
+                      }}
+                    >
+                      remove
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
 
 export default function Accounts() {
   const state = useStore();
@@ -9,6 +62,7 @@ export default function Accounts() {
   function add() {
     if (!form.label) return;
     addAccount(form);
+    if (form.email.trim()) addEmail({ address: form.email, label: '' }); // auto-register new IDs
     setForm({ label: '', bank: '', last4: '', email: '' });
   }
 
@@ -37,13 +91,18 @@ export default function Accounts() {
         alerts map to the right place.
       </p>
 
+      <EmailRegistry emails={state.emails} accounts={state.accounts} />
+
       <div className="card">
         <h2 style={{ marginTop: 0 }}>Add account</h2>
         <div className="row">
           <input placeholder="Label — e.g. HDFC Current (Business)" value={form.label} onChange={set('label')} style={{ minWidth: 220 }} />
           <input placeholder="Bank" value={form.bank} onChange={set('bank')} style={{ width: 120 }} />
           <input placeholder="Last 4 digits" value={form.last4} onChange={set('last4')} maxLength={4} style={{ width: 110 }} />
-          <input placeholder="Linked email ID" type="email" value={form.email} onChange={set('email')} style={{ minWidth: 200 }} />
+          <input placeholder="Linked email ID" type="email" list="registered-emails" value={form.email} onChange={set('email')} style={{ minWidth: 200 }} />
+          <datalist id="registered-emails">
+            {state.emails.map((e) => <option key={e.id} value={e.address}>{e.label}</option>)}
+          </datalist>
           <button onClick={add}>Add</button>
         </div>
       </div>

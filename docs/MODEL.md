@@ -82,6 +82,18 @@ Received amount is derived: sum of credit transactions with `trancheId = id`.
 }
 ```
 
+### Email
+```ts
+{
+  id: string,
+  address: string,            // unique (case-insensitive)
+  label: string,              // "Personal" | "Business" | ...
+}
+```
+The registry of inboxes that feed the system; `Account.email` references an
+address from it (free-text tolerated). Adding an account with an unknown
+email auto-registers it.
+
 ### Loan
 ```ts
 {
@@ -116,6 +128,7 @@ subscribers. Signature → effect:
 | `addManishClaims` | `(claims[])` → `added` | Dedup by `(date, amount, text)`. |
 | `updateManishClaim` / `removeManishClaim` | `(id, patch)` / `(id)` | Reconciliation bookkeeping. |
 | `addLoan` / `updateLoan` / `removeLoan` | `(loan)` / `(id, patch)` / `(id)` | Loan register. |
+| `addEmail` / `removeEmail` | `({address, label})` / `(id)` | Email-ID registry; add dedupes case-insensitively. |
 | `exportAll` / `importAll` | `()` → json / `(json)` | Full backup / restore. |
 
 ## 3. Derived views (pure functions, no state)

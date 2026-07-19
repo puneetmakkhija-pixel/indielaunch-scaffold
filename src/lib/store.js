@@ -15,6 +15,9 @@ const emptyState = {
   tranches: [],
   manishClaims: [],
   loans: [],
+  emails: [
+    { id: 'email-primary', address: 'puneetmakkhija@gmail.com', label: 'Personal' },
+  ],
 };
 
 function load() {
@@ -205,6 +208,18 @@ export function updateManishClaim(id, patch) {
 
 export function removeManishClaim(id) {
   setState((s) => ({ manishClaims: s.manishClaims.filter((c) => c.id !== id) }));
+}
+
+export function addEmail(email) {
+  setState((s) => {
+    const address = (email.address || '').trim().toLowerCase();
+    if (!address || s.emails.some((e) => e.address.toLowerCase() === address)) return {};
+    return { emails: [...s.emails, { id: uid(), label: '', ...email, address }] };
+  });
+}
+
+export function removeEmail(id) {
+  setState((s) => ({ emails: s.emails.filter((e) => e.id !== id) }));
 }
 
 export function addLoan(loan) {
