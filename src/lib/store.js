@@ -94,13 +94,13 @@ export function importTransactions(accountId, parsed, source) {
     for (const p of parsed) {
       const t = {
         id: uid(),
-        accountId,
         source,
         reviewed: false,
         head: null,
         scope: null,
         trancheId: null,
         ...p,
+        accountId: p.accountId || accountId,
       };
       const h = txnHash(t);
       if (existing.has(h)) {

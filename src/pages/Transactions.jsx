@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useStore, tagTransaction, updateTransaction, deleteTransaction, addManualTransaction } from '../lib/store.js';
 import { HEAD_NAMES, defaultScopeForHead, guessMerchantToken } from '../lib/categorize.js';
+import { suggestTag } from '../lib/suggest.js';
 import { inr2 } from '../lib/parsers/common.js';
 
 function TagEditor({ txn, onDone }) {
@@ -102,6 +103,23 @@ export default function Transactions() {
     [state.accounts]
   );
 
+  // Similarity suggestions for untagged rows, based on what's already tagged.
+  const taggedTxns = useMemo(() => state.transactions.filter((t) => t.head), [state.transactions]);
+  const suggestions = useMemo(() => {
+    const map = {};
+    for (const t of state.transactions) {
+      if (t.head) continue;
+      const s = suggestTag(t, taggedTxns);
+      if (s) map[t.id] = s;
+    }
+    return map;
+  }, [state.transactions, taggedTxns]);
+
+  function applySuggestion(t) {
+    const s = suggestions[t.id];
+    if (s) tagTransaction(t.id, { head: s.head, scope: s.scope });
+  }
+
   const txns = state.transactions.filter((t) => {
     if (filter === 'unreviewed' && t.reviewed) return false;
     if (filter === 'untagged' && t.head) return false;
@@ -166,6 +184,13 @@ export default function Transactions() {
                       <td style={{ whiteSpace: 'nowrap' }}>
                         {t.head ? (
                           <>{t.head} {t.autoTagged && !t.reviewed && <span className="muted" title="auto-tagged by rule">(auto)</span>}</>
+                        ) : suggestions[t.id] ? (
+                          <span title={'Similar to: ' + suggestions[t.id].example}>
+                            <span className="pill untagged">untagged</span>{' '}
+                            <button className="small secondary" onClick={() => applySuggestion(t)}>
+                              → {suggestions[t.id].head}?
+                            </button>
+                          </span>
                         ) : (
                           <span className="pill untagged">untagged</span>
                         )}

@@ -119,13 +119,14 @@ export async function parsePdfStatement(arrayBuffer, password = '') {
       // can't infer the first row from a previous balance; try the next row backwards
       direction = null;
     }
+    const balanceField = r.balance != null ? { balance: r.balance } : {};
     if (!direction) {
       // fall back: mark as debit but flag for review
       direction = 'debit';
-      out.push({ date: r.date, narration: r.narration, amount: r.amount, direction, uncertain: true });
+      out.push({ date: r.date, narration: r.narration, amount: r.amount, direction, uncertain: true, ...balanceField });
       continue;
     }
-    out.push({ date: r.date, narration: r.narration, amount: r.amount, direction });
+    out.push({ date: r.date, narration: r.narration, amount: r.amount, direction, ...balanceField });
   }
 
   if (!out.length) {

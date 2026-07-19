@@ -42,6 +42,7 @@ const DEBIT_HEADERS = ['withdrawal amt', 'withdrawal', 'debit', 'debit amount', 
 const CREDIT_HEADERS = ['deposit amt', 'deposit', 'credit', 'credit amount', 'cr amount', 'deposits'];
 const AMOUNT_HEADERS = ['amount', 'transaction amount', 'amount (inr)'];
 const DRCR_HEADERS = ['dr/cr', 'dr / cr', 'type', 'cr/dr'];
+const BALANCE_HEADERS = ['closing balance', 'running balance', 'balance (inr)', 'balance'];
 
 function findCol(headers, names) {
   for (const name of names) {
@@ -75,6 +76,7 @@ export function parseCsvStatement(text) {
         credit: findCol(headers, CREDIT_HEADERS),
         amount: findCol(headers, AMOUNT_HEADERS),
         drcr: findCol(headers, DRCR_HEADERS),
+        balance: findCol(headers, BALANCE_HEADERS),
       };
       break;
     }
@@ -112,7 +114,12 @@ export function parseCsvStatement(text) {
       }
     }
     if (amount == null || !direction) continue;
-    out.push({ date, narration, amount, direction });
+    let balance = null;
+    if (cols.balance !== -1 && row[cols.balance] != null) {
+      // Kotak suffixes the balance with (Cr)/(Dr)
+      balance = parseAmount(String(row[cols.balance]).replace(/\(?\s*(cr|dr)\s*\)?\.?\s*$/i, ''));
+    }
+    out.push({ date, narration, amount, direction, ...(balance != null ? { balance } : {}) });
   }
   return out;
 }

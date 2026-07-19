@@ -30,7 +30,7 @@ test('HDFC CSV: Withdrawal/Deposit columns', () => {
   ].join('\n');
   const out = parseCsvStatement(csv);
   assert.equal(out.length, 2);
-  assert.deepEqual(out[0], { date: '2026-07-01', narration: 'UPI-ZOMATO-zomato@paytm', amount: 350, direction: 'debit' });
+  assert.deepEqual(out[0], { date: '2026-07-01', narration: 'UPI-ZOMATO-zomato@paytm', amount: 350, direction: 'debit', balance: 120551 });
   assert.equal(out[1].direction, 'credit');
   assert.equal(out[1].amount, 500000);
 });

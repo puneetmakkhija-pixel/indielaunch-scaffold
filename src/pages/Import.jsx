@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore, importTransactions } from '../lib/store.js';
 import { parseCsvStatement } from '../lib/parsers/csv.js';
+import { parseAlerts } from '../lib/parsers/alerts.js';
 import { inr2 } from '../lib/parsers/common.js';
 
 // Typical e-statement PDF passwords by bank — formats vary by account
@@ -23,8 +24,30 @@ export default function ImportPage() {
   const [result, setResult] = useState(null);
   const [pdfPassword, setPdfPassword] = useState('');
   const [needsPassword, setNeedsPassword] = useState(false);
+  const [alertText, setAlertText] = useState('');
   const pdfFileRef = useRef(null);
   const activeAccount = accountId || bankAccounts[0]?.id || '';
+
+  function handleAlerts() {
+    setError('');
+    setResult(null);
+    const { transactions, skippedNoDate } = parseAlerts(alertText);
+    if (!transactions.length) {
+      setError(
+        'No alerts recognised. Paste the alert text itself, e.g. "Rs.449.00 debited from a/c **1234 on 01-07-26 to VPA swiggy@ybl".' +
+          (skippedNoDate ? ` (${skippedNoDate} alert(s) had no date and were skipped.)` : '')
+      );
+      return;
+    }
+    // Route each alert to the account whose registered last-4 matches.
+    const routed = transactions.map((t) => {
+      const acc = t.last4 && bankAccounts.find((a) => a.last4 && a.last4 === t.last4);
+      const { last4, ...rest } = t;
+      return acc ? { ...rest, accountId: acc.id } : rest;
+    });
+    setPreview({ source: 'alert', txns: routed });
+    setAlertText('');
+  }
 
   async function handlePdf(file) {
     setError('');
@@ -203,6 +226,24 @@ export default function ImportPage() {
           </div>
         </div>
       )}
+
+      <div className="card">
+        <h2 style={{ marginTop: 0 }}>Paste bank alerts (daily quick-add)</h2>
+        <p className="muted" style={{ marginBottom: '0.75rem' }}>
+          Copy the debit/credit alert emails or SMS from HDFC, IndusInd or Kotak and paste them here —
+          one or many at once. Alerts carrying an account's last-4 digits (set them on the{' '}
+          <Link to="/accounts">Accounts</Link> page) are routed to that account automatically; the rest
+          go to the account selected above.
+        </p>
+        <textarea
+          rows={4}
+          style={{ width: '100%', marginBottom: '0.6rem' }}
+          placeholder={'Rs.449.00 debited from a/c **1234 on 01-07-26 to VPA swiggy@ybl (UPI Ref 5123...)\nRs.50,000.00 credited to a/c **5678 on 02-07-26 by a/c linked to VPA manish@okhdfcbank'}
+          value={alertText}
+          onChange={(e) => setAlertText(e.target.value)}
+        />
+        <button onClick={handleAlerts} disabled={!alertText.trim()}>Parse alerts</button>
+      </div>
 
       <div className="card">
         <h2 style={{ marginTop: 0 }}>Daily email & auto-sync (roadmap)</h2>
