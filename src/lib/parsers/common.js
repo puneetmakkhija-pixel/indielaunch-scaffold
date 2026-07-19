@@ -14,7 +14,8 @@ function toIso(y, m, d) {
 // 02/07/2026, 02-07-26, 02 Jul 2026, 02-Jul-2026, 2026-07-02
 export function parseIndianDate(s) {
   if (!s) return null;
-  const str = String(s).trim();
+  // Kotak-style "20-01-2026 16:35:49" — drop the trailing timestamp
+  const str = String(s).trim().replace(/\s+\d{1,2}:\d{2}(:\d{2})?\s*(am|pm|AM|PM)?$/, '');
   let m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (m) return toIso(+m[1], +m[2] - 1, +m[3]);
   m = str.match(/^(\d{1,2})[-/. ](\d{1,2})[-/. ](\d{2,4})$/);

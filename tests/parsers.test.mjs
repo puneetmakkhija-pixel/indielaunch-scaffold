@@ -12,6 +12,21 @@ test('dates: formats used by HDFC / IndusInd / Kotak statements', () => {
   assert.equal(parseIndianDate('2 Jul, 2026'), '2026-07-02');
   assert.equal(parseIndianDate('2026-07-02'), '2026-07-02');
   assert.equal(parseIndianDate('31/02/2026'), null); // impossible date
+  assert.equal(parseIndianDate('20-01-2026 16:35:49'), '2026-01-20'); // Kotak timestamped
+});
+
+test('Kotak CSV: timestamped dates and Dr-signed balance column', () => {
+  const csv = [
+    '"Sl. No.","Transaction Date","Value Date","Description","Chq /Ref No.","Amount","Dr / Cr","Balance","Dr / Cr"',
+    '"1","20-01-2026 16:35:49","20-01-2026","BRB:Sent RTGS GST/RESERVE","000508","3,00,000.00","DR","1,96,175.00","DR"',
+    '"2","21-01-2026 14:35:44","21-01-2026","NEFT BVALUE SERVICES PRIVATE LIM","NEFT-1","12,36,325.00","CR","12,58,660.00","CR"',
+  ].join('\n');
+  const out = parseCsvStatement(csv);
+  assert.equal(out.length, 2);
+  assert.equal(out[0].date, '2026-01-20');
+  assert.equal(out[0].direction, 'debit');
+  assert.equal(out[0].balance, -196175); // DR balance = overdrawn
+  assert.equal(out[1].balance, 1258660);
 });
 
 test('amounts: lakh separators, negatives, blanks', () => {

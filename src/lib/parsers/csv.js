@@ -78,6 +78,12 @@ export function parseCsvStatement(text) {
         drcr: findCol(headers, DRCR_HEADERS),
         balance: findCol(headers, BALANCE_HEADERS),
       };
+      // Kotak repeats a Dr/Cr column AFTER the balance to sign it (Dr = overdrawn)
+      const balIdx = cols.balance;
+      cols.balanceDrcr =
+        balIdx !== -1 && balIdx + 1 < headers.length && /dr\s*\/?\s*cr|cr\s*\/?\s*dr/.test(headers[balIdx + 1])
+          ? balIdx + 1
+          : -1;
       break;
     }
   }
@@ -118,6 +124,9 @@ export function parseCsvStatement(text) {
     if (cols.balance !== -1 && row[cols.balance] != null) {
       // Kotak suffixes the balance with (Cr)/(Dr)
       balance = parseAmount(String(row[cols.balance]).replace(/\(?\s*(cr|dr)\s*\)?\.?\s*$/i, ''));
+      if (balance != null && cols.balanceDrcr !== -1 && /dr/i.test(row[cols.balanceDrcr] || '')) {
+        balance = -balance; // Dr balance = overdrawn
+      }
     }
     out.push({ date, narration, amount, direction, ...(balance != null ? { balance } : {}) });
   }

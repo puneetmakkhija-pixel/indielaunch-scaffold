@@ -88,7 +88,24 @@ export const DEFAULT_RULES = [
   { pattern: 'CRED CLUB', head: 'Card Bill Payment', scope: null },
   { pattern: 'CC PAYMENT', head: 'Card Bill Payment', scope: null },
   { pattern: 'CREDIT CARD PAYMENT', head: 'Card Bill Payment', scope: null },
-  { pattern: 'MANISH', head: 'Manish Transfer', scope: 'business' },
+  // Two different Manishes exist in these statements — only Manish Tandon is
+  // the ledger partner; Manish Srivastav is a separate payee.
+  { pattern: 'MANISH TAN', head: 'Manish Transfer', scope: 'business' },
+  { pattern: 'SWEEP TRANSFER TO', head: 'Self Transfer', scope: null },
+  { pattern: 'SWEEP TRF FROM', head: 'Self Transfer', scope: null },
+  { pattern: 'FD PREMAT PROCEEDS', head: 'Self Transfer', scope: null },
+  { pattern: 'BVALUE SERVICES', head: 'Revenue / Client Payment', scope: 'business' },
+  { pattern: 'ETAX GSTN', head: 'GST / Taxes', scope: 'business' },
+  { pattern: 'JDS ENTERPRISES', head: 'Vendor Payment', scope: 'business' },
+  { pattern: 'AEROCHAP', head: 'Vendor Payment', scope: 'business' },
+  { pattern: 'INCLINE AERO', head: 'Vendor Payment', scope: 'business' },
+  { pattern: 'BSES', head: 'Utilities & Telecom', scope: 'business' },
+  { pattern: 'ANTHROPIC', head: 'SaaS & Software', scope: 'business' },
+  { pattern: 'ZOHO', head: 'SaaS & Software', scope: 'business' },
+  { pattern: 'TWILIO', head: 'SaaS & Software', scope: 'business' },
+  { pattern: 'MICROSOFT', head: 'SaaS & Software', scope: 'business' },
+  { pattern: 'GOOGLE WORKSPACE', head: 'SaaS & Software', scope: 'business' },
+  { pattern: 'DEEPIKA MAKHIJA', head: 'Family & Gifts', scope: 'personal' },
 ].map((r, i) => ({ id: 'default-' + i, builtin: true, ...r }));
 
 // Apply the first matching rule to a transaction. Returns {head, scope} or null.
