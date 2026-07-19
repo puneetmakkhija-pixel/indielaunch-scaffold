@@ -6,7 +6,7 @@ const KEY = 'munshi_state_v1';
 const emptyState = {
   accounts: [
     { id: 'cash', label: 'Cash in hand', bank: 'Cash', last4: '', email: '', type: 'cash' },
-    { id: 'hdfc', label: 'HDFC', bank: 'HDFC', last4: '', email: 'puneetmakkhija@gmail.com', type: 'bank' },
+    { id: 'hdfc', label: 'HDFC Savings (primary)', bank: 'HDFC', last4: '9780', email: 'puneetmakkhija@gmail.com', type: 'bank' },
     { id: 'indusind', label: 'IndusInd', bank: 'IndusInd', last4: '', email: 'puneetmakkhija@gmail.com', type: 'bank' },
     { id: 'kotak', label: 'Kotak', bank: 'Kotak', last4: '', email: 'puneetmakkhija@gmail.com', type: 'bank' },
   ],
