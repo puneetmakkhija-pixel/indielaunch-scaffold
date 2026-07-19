@@ -17,6 +17,7 @@ const emptyState = {
   loans: [],
   emails: [
     { id: 'email-primary', address: 'puneetmakkhija@gmail.com', label: 'Personal' },
+    { id: 'email-alt', address: 'puneet.borntolead@gmail.com', label: 'Personal (alt)' },
   ],
 };
 

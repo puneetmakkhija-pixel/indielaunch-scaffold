@@ -1,7 +1,8 @@
 {
   "emails": [
     { "id": "email-primary", "address": "puneetmakkhija@gmail.com", "label": "Personal" },
-    { "id": "email-business", "address": "info@zeroerrorfilings.com", "label": "Business (Zero Error Filings)" }
+    { "id": "email-business", "address": "info@zeroerrorfilings.com", "label": "Business (Zero Error Filings)" },
+    { "id": "email-alt", "address": "puneet.borntolead@gmail.com", "label": "Personal (alt)" }
   ],
   "accounts": [
     { "id": "cash", "label": "Cash in hand", "bank": "Cash", "last4": "", "email": "", "type": "cash" },
