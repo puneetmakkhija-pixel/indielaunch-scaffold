@@ -4,6 +4,15 @@ import { useStore, importTransactions } from '../lib/store.js';
 import { parseCsvStatement } from '../lib/parsers/csv.js';
 import { inr2 } from '../lib/parsers/common.js';
 
+// Typical e-statement PDF passwords by bank — formats vary by account
+// vintage, so these are hints, not guarantees; the exact format is stated
+// in the bank's statement email.
+const PDF_PASSWORD_HINTS = {
+  HDFC: 'HDFC usually uses your Customer ID, or name (first 4 letters) + DOB (DDMM).',
+  IndusInd: 'IndusInd usually uses your registered mobile number or DOB (DDMMYYYY).',
+  Kotak: 'Kotak usually uses your CRN (printed on your debit card).',
+};
+
 export default function ImportPage() {
   const state = useStore();
   const bankAccounts = state.accounts.filter((a) => a.type === 'bank');
@@ -31,7 +40,7 @@ export default function ImportPage() {
     } catch (e) {
       if (e.message === 'PASSWORD_REQUIRED') {
         setNeedsPassword(true);
-        setError('This PDF is password-protected (banks usually use your DOB or PAN — check the statement email). Enter it below and re-select the file.');
+        setError('This PDF is password-protected. Enter the password below and click "Unlock & parse".');
       } else {
         setError(e.message || String(e));
       }
@@ -109,13 +118,28 @@ export default function ImportPage() {
             </label>
             {needsPassword && (
               <label className="field" style={{ marginTop: '0.75rem' }}>
-                <span>PDF password</span>
-                <input
-                  type="password"
-                  value={pdfPassword}
-                  onChange={(e) => setPdfPassword(e.target.value)}
-                  placeholder="e.g. DDMMYYYY or PAN"
-                />
+                <span>
+                  PDF password
+                  {(() => {
+                    const bank = bankAccounts.find((a) => a.id === activeAccount)?.bank;
+                    return PDF_PASSWORD_HINTS[bank] ? ' — ' + PDF_PASSWORD_HINTS[bank] : '';
+                  })()}
+                </span>
+                <div className="row">
+                  <input
+                    type="password"
+                    value={pdfPassword}
+                    onChange={(e) => setPdfPassword(e.target.value)}
+                    placeholder="Check the bank's statement email"
+                  />
+                  <button
+                    className="small"
+                    disabled={!pdfPassword || busy}
+                    onClick={() => pdfFileRef.current && handlePdf(pdfFileRef.current)}
+                  >
+                    Unlock & parse
+                  </button>
+                </div>
               </label>
             )}
           </div>
