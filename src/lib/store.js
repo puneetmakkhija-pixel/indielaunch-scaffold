@@ -11,6 +11,8 @@ const emptyState = {
     { id: 'indusind-cc', label: 'IndusInd Credit Card', bank: 'IndusInd', last4: '8829', email: 'puneetmakkhija@gmail.com', type: 'card' },
     { id: 'amex-plat', label: 'Amex Platinum charge', bank: 'American Express', last4: '1008', email: 'puneetmakkhija@gmail.com', type: 'card', dueDay: 11 },
     { id: 'amex-reserve', label: 'Amex Platinum Reserve', bank: 'American Express', last4: '1004', email: 'puneetmakkhija@gmail.com', type: 'card', limit: 586000, dueDay: 10 },
+    { id: 'sbi-paytm', label: 'Paytm SBI Card', bank: 'SBI Card', last4: '7209', email: 'puneet.borntolead@gmail.com', type: 'card' },
+    { id: 'indusind-cc2', label: 'IndusInd Card (second)', bank: 'IndusInd', last4: '5984', email: 'puneet.borntolead@gmail.com', type: 'card' },
     { id: 'kotak', label: 'Kotak', bank: 'Kotak', last4: '', email: 'puneetmakkhija@gmail.com', type: 'bank' },
   ],
   transactions: [],
