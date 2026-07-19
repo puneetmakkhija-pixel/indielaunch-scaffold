@@ -10,7 +10,7 @@ import { parseIndianDate } from './common.js';
 
 // Android: "12/07/2026, 10:31 pm - Puneet: Sent 50000"
 // iOS:     "[12/07/26, 10:31:45 PM] Manish: received 50k"
-const MSG_RE = /^\[?(\d{1,2}\/\d{1,2}\/\d{2,4}),? (\d{1,2}:\d{2}(?::\d{2})?\s?(?:am|pm|AM|PM)?)\]?\s*[-–]?\s*([^:]+): ([\s\S]*)$/;
+const MSG_RE = /^\[?(\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}),? (\d{1,2}:\d{2}(?::\d{2})?\s?(?:am|pm|AM|PM)?)\]?\s*[-–]?\s*([^:]+): ([\s\S]*)$/;
 
 const AMOUNT_RE = /(?:₹|rs\.?|inr)\s*([\d,]+(?:\.\d+)?)\s*(k|K|lakh|lakhs|lac|lacs|l|L|cr|Cr)?|(?<![\d.,/:])([\d,]+(?:\.\d+)?)\s*(k|K|lakh|lakhs|lac|lacs)?(?![\d%/:])/;
 
@@ -34,7 +34,7 @@ function parseAmountWithUnits(match) {
 }
 
 export function parseWhatsAppChat(text, myNameHint = '') {
-  const lines = text.split(/\r?\n/);
+  const lines = text.replace(/\u202f/g, " ").split(/\r?\n/);
   const messages = [];
   for (const line of lines) {
     const m = line.replace(/[‎‏‪-‮]/g, '').match(MSG_RE);
@@ -50,11 +50,21 @@ export function parseWhatsAppChat(text, myNameHint = '') {
     senders.find((s) => myNameHint && s.toLowerCase().includes(myNameHint.toLowerCase())) || null;
 
   const claims = [];
+  const BANK_SMS = /\b(a\/c\s*x+\d|your (account|rtgs|imps)|ref\.?\s*no|credited to .*bank|debited with rs)/i;
+  const claimAmount = (text) => {
+    // pick the largest plausible amount; refs/account numbers are filtered by the cap
+    let best = null;
+    for (const m of text.matchAll(new RegExp(AMOUNT_RE.source, 'gi'))) {
+      const n = parseAmountWithUnits(m);
+      if (n && n >= 100 && n <= 50000000 && (!best || n > best)) best = n;
+    }
+    return best;
+  };
   for (const msg of messages) {
     if (!msg.date || !MONEY_CONTEXT.test(msg.text)) continue;
-    const am = msg.text.match(AMOUNT_RE);
-    if (!am) continue;
-    const amount = parseAmountWithUnits(am);
+    // forwarded bank SMS/alerts duplicate what statements already carry
+    if (BANK_SMS.test(msg.text)) continue;
+    const amount = claimAmount(msg.text);
     if (!amount) continue;
 
     const fromMe = me ? msg.sender === me : null;

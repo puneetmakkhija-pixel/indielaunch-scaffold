@@ -7,7 +7,8 @@ const emptyState = {
   accounts: [
     { id: 'cash', label: 'Cash in hand', bank: 'Cash', last4: '', email: '', type: 'cash' },
     { id: 'hdfc', label: 'HDFC Savings (primary)', bank: 'HDFC', last4: '9780', email: 'puneetmakkhija@gmail.com', type: 'bank' },
-    { id: 'indusind', label: 'IndusInd', bank: 'IndusInd', last4: '', email: 'puneetmakkhija@gmail.com', type: 'bank' },
+    { id: 'indusind', label: 'IndusInd Select (personal)', bank: 'IndusInd', last4: '6786', email: 'puneetmakkhija@gmail.com', type: 'bank' },
+    { id: 'indusind-cc', label: 'IndusInd Credit Card', bank: 'IndusInd', last4: '8829', email: 'puneetmakkhija@gmail.com', type: 'card' },
     { id: 'kotak', label: 'Kotak', bank: 'Kotak', last4: '', email: 'puneetmakkhija@gmail.com', type: 'bank' },
   ],
   transactions: [],
