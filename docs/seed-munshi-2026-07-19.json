@@ -1,0 +1,40 @@
+{
+  "emails": [
+    { "id": "email-primary", "address": "puneetmakkhija@gmail.com", "label": "Personal" },
+    { "id": "email-business", "address": "info@zeroerrorfilings.com", "label": "Business (Zero Error Filings)" },
+    { "id": "email-alt", "address": "puneet.borntolead@gmail.com", "label": "Personal (alt)" },
+    { "id": "email-work", "address": "puneet.makhija@buddyloan.com", "label": "Work (BuddyLoan)" }
+  ],
+  "accounts": [
+    { "id": "cash", "label": "Cash in hand", "bank": "Cash", "last4": "", "email": "", "type": "cash" },
+    { "id": "hdfc", "label": "HDFC Savings (primary)", "bank": "HDFC", "last4": "9780", "email": "puneetmakkhija@gmail.com", "type": "bank" },
+    { "id": "indusind", "label": "IndusInd Select (personal)", "bank": "IndusInd", "last4": "6786", "email": "puneetmakkhija@gmail.com", "type": "bank" },
+    { "id": "indusind-cc", "label": "IndusInd Credit Card", "bank": "IndusInd", "last4": "8829", "email": "puneetmakkhija@gmail.com", "type": "card" },
+    { "id": "kotak", "label": "Kotak — Cube Finserve (Manish's co., DSA of BuddyLoan)", "bank": "Kotak", "last4": "4444", "email": "puneetmakkhija@gmail.com", "type": "bank" },
+    { "id": "au-cube", "label": "AU SFB — Cube Fin India Pvt Ltd (FROZEN/closure notice)", "bank": "AU Small Finance", "last4": "8092", "email": "puneetmakkhija@gmail.com", "type": "bank" },
+    { "id": "amex-plat", "label": "Amex Platinum charge (fee ₹77,882 OVERDUE since 11-Jul)", "bank": "American Express", "last4": "1008", "email": "puneetmakkhija@gmail.com", "type": "card", "dueDay": 11, "outstanding": 77882 },
+    { "id": "amex-reserve", "label": "Amex Platinum Reserve", "bank": "American Express", "last4": "1004", "email": "puneetmakkhija@gmail.com", "type": "card", "limit": 586000, "dueDay": 10, "outstanding": 465493.53 },
+    { "id": "sbi-paytm", "label": "Paytm SBI Card", "bank": "SBI Card", "last4": "7209", "email": "puneet.borntolead@gmail.com", "type": "card" },
+    { "id": "indusind-cc2", "label": "IndusInd Card (second)", "bank": "IndusInd", "last4": "5984", "email": "puneet.borntolead@gmail.com", "type": "card" }
+  ],
+  "loans": [
+    { "id": "yes-loan-1", "lender": "Yes Bank (Race Div) — UMRN …11341", "outstanding": 0, "emi": 36170, "rate": 0, "emiDay": 15, "notes": "NACH from HDFC 9780 on the 15th; confirmed Apr/May/Jul 2026. Fill outstanding & rate from the sanction letter." },
+    { "id": "yes-loan-2", "lender": "Yes Bank (Race Div) — UMRN …11467", "outstanding": 0, "emi": 38589, "rate": 0, "emiDay": 15, "notes": "NACH from HDFC 9780 on the 15th; confirmed Apr/May/Jul 2026. Fill outstanding & rate from the sanction letter." }
+  ],
+  "transactions": [
+    { "id": "seed-t1", "accountId": "hdfc", "date": "2026-07-19", "narration": "UPI-Blinkit-blinkit.rzp@hdfcbank ref 620064810354", "amount": 555, "direction": "debit", "head": "Groceries", "scope": "personal", "reviewed": true, "trancheId": null, "source": "alert" },
+    { "id": "seed-t2", "accountId": "hdfc", "date": "2026-07-17", "narration": "UPI-Amazon Pay-amznlpa-smadxsti8k@rapl ref 619820867308", "amount": 1000, "direction": "debit", "head": "Shopping", "scope": "personal", "reviewed": true, "trancheId": null, "source": "alert" },
+    { "id": "seed-t3", "accountId": "hdfc", "date": "2026-07-09", "narration": "UPI-MMTC-PAMP-V2-paytm-14676198@ptybl (digital gold autopay)", "amount": 301, "direction": "debit", "head": "Investments (Personal)", "scope": "personal", "reviewed": true, "trancheId": null, "source": "alert" },
+    { "id": "seed-t4", "accountId": "hdfc", "date": "2026-07-10", "narration": "UPI-MMTC-PAMP-V2-paytm-14676198@ptybl (digital gold autopay)", "amount": 301, "direction": "debit", "head": "Investments (Personal)", "scope": "personal", "reviewed": true, "trancheId": null, "source": "alert" },
+    { "id": "seed-t5", "accountId": "hdfc", "date": "2026-07-13", "narration": "UPI-MMTC-PAMP-V2-paytm-14676198@ptybl (digital gold autopay)", "amount": 301, "direction": "debit", "head": "Investments (Personal)", "scope": "personal", "reviewed": true, "trancheId": null, "source": "alert" },
+    { "id": "seed-t6", "accountId": "hdfc", "date": "2026-07-14", "narration": "UPI-MMTC-PAMP-V2-paytm-14676198@ptybl (digital gold autopay)", "amount": 301, "direction": "debit", "head": "Investments (Personal)", "scope": "personal", "reviewed": true, "trancheId": null, "source": "alert" },
+    { "id": "seed-t7", "accountId": "hdfc", "date": "2026-07-15", "narration": "UPI-MMTC-PAMP-V2-paytm-14676198@ptybl (digital gold autopay)", "amount": 301, "direction": "debit", "head": "Investments (Personal)", "scope": "personal", "reviewed": true, "trancheId": null, "source": "alert" },
+    { "id": "seed-t8", "accountId": "hdfc", "date": "2026-07-16", "narration": "UPI-MMTC-PAMP-V2-paytm-14676198@ptybl (digital gold autopay)", "amount": 301, "direction": "debit", "head": "Investments (Personal)", "scope": "personal", "reviewed": true, "trancheId": null, "source": "alert" },
+    { "id": "seed-t9", "accountId": "hdfc", "date": "2026-07-17", "narration": "UPI-MMTC-PAMP-V2-paytm-14676198@ptybl (digital gold autopay)", "amount": 301, "direction": "debit", "head": "Investments (Personal)", "scope": "personal", "reviewed": true, "trancheId": null, "source": "alert" },
+    { "id": "seed-t10", "accountId": "hdfc", "date": "2026-07-18", "narration": "UPI-MMTC-PAMP-V2-paytm-14676198@ptybl (digital gold autopay)", "amount": 301, "direction": "debit", "head": "Investments (Personal)", "scope": "personal", "reviewed": true, "trancheId": null, "source": "alert" },
+    { "id": "seed-t11", "accountId": "hdfc", "date": "2026-07-12", "narration": "Credit INR 5000 (per HDFC alert 12-07-26)", "amount": 5000, "direction": "credit", "head": null, "scope": null, "reviewed": false, "trancheId": null, "source": "alert" },
+    { "id": "seed-t12", "accountId": "hdfc", "date": "2026-07-14", "narration": "Cash Deposit Machine Kirti Nagar G14", "amount": 73500, "direction": "credit", "head": null, "scope": null, "reviewed": false, "trancheId": null, "source": "alert" },
+    { "id": "seed-t13", "accountId": "hdfc", "date": "2026-07-15", "narration": "NACH-Yes Bank Limited Race Division/3179667 UMRN HDFC7012408220011341", "amount": 36170, "direction": "debit", "head": "EMI & Loans", "scope": "personal", "reviewed": true, "trancheId": null, "source": "alert" },
+    { "id": "seed-t14", "accountId": "hdfc", "date": "2026-07-15", "narration": "NACH-Yes Bank Limited Race Division/3179667 UMRN HDFC7012408220011467", "amount": 38589, "direction": "debit", "head": "EMI & Loans", "scope": "personal", "reviewed": true, "trancheId": null, "source": "alert" }
+  ]
+}
