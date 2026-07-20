@@ -94,6 +94,8 @@ export default function Transactions() {
   const [filter, setFilter] = useState('unreviewed');
   const [scopeFilter, setScopeFilter] = useState('');
   const [accountFilter, setAccountFilter] = useState('');
+  const [dirFilter, setDirFilter] = useState('');
+  const [headFilter, setHeadFilter] = useState('');
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState(null);
   const [showManual, setShowManual] = useState(false);
@@ -125,6 +127,8 @@ export default function Transactions() {
     if (filter === 'untagged' && t.head) return false;
     if (scopeFilter && t.scope !== scopeFilter) return false;
     if (accountFilter && t.accountId !== accountFilter) return false;
+    if (dirFilter && t.direction !== dirFilter) return false;
+    if (headFilter === '(untagged)' ? t.head : headFilter && t.head !== headFilter) return false;
     if (search && !(t.narration || '').toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
@@ -160,6 +164,16 @@ export default function Transactions() {
           <select value={accountFilter} onChange={(e) => setAccountFilter(e.target.value)}>
             <option value="">All accounts</option>
             {state.accounts.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}
+          </select>
+          <select value={dirFilter} onChange={(e) => setDirFilter(e.target.value)}>
+            <option value="">In & out</option>
+            <option value="debit">Debits (out)</option>
+            <option value="credit">Credits (in)</option>
+          </select>
+          <select value={headFilter} onChange={(e) => setHeadFilter(e.target.value)}>
+            <option value="">Any head</option>
+            <option value="(untagged)">— Untagged —</option>
+            {HEAD_NAMES.map((h) => <option key={h} value={h}>{h}</option>)}
           </select>
           <input placeholder="Search narration…" value={search} onChange={(e) => setSearch(e.target.value)} style={{ flex: 1, minWidth: 160 }} />
         </div>
