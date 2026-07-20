@@ -97,6 +97,27 @@ export const DEFAULT_RULES = [
   { pattern: 'FD PREMAT PROCEEDS', head: 'Self Transfer', scope: null },
   { pattern: 'ETAX GSTN', head: 'GST / Taxes', scope: 'business' },
   { pattern: 'BSES', head: 'Utilities & Telecom', scope: 'business' },
+  { pattern: 'MMTC', head: 'Investments (Personal)', scope: 'personal' },
+  // Card-statement interest & fee lines
+  { pattern: 'FINANCE CHARGES', head: 'Bank Charges', scope: 'personal' },
+  { pattern: 'FINANCE CHARGE', head: 'Bank Charges', scope: 'personal' },
+  { pattern: 'FOREIGN CURRENCY MARKUP', head: 'Bank Charges', scope: 'personal' },
+  { pattern: 'IGST', head: 'Bank Charges', scope: 'personal' },
+  { pattern: 'GST @ 18%', head: 'Bank Charges', scope: 'personal' },
+  { pattern: 'INSTALLMENT PRINCIPAL', head: 'EMI & Loans', scope: 'personal' },
+  { pattern: 'CRED.CLUB', head: 'Card Bill Payment', scope: null },
+  { pattern: 'SHRIRAM', head: 'EMI & Loans', scope: 'personal' },
+  { pattern: 'LAZY', head: 'EMI & Loans', scope: 'personal' },
+  { pattern: 'NFS CASH', head: 'Cash Withdrawal', scope: null },
+  { pattern: 'APPLE', head: 'Entertainment & OTT', scope: 'personal' },
+  // Apple's UPI collect handle (s.bdsi@ / appleservices.bdsi@)
+  { pattern: '.BDSI@', head: 'Entertainment & OTT', scope: 'personal' },
+  { pattern: 'GOOGLE PLAY', head: 'Entertainment & OTT', scope: 'personal' },
+  // Netflix's UPI handle rows come through as "Netf" (never matches NEFT)
+  { pattern: 'NETF', head: 'Entertainment & OTT', scope: 'personal' },
+  { pattern: 'PVR', head: 'Entertainment & OTT', scope: 'personal' },
+  // Blinkit collects via this Razorpay handle
+  { pattern: 'IT.RZP@', head: 'Groceries', scope: 'personal' },
   { pattern: 'ANTHROPIC', head: 'SaaS & Software', scope: 'business' },
   { pattern: 'ZOHO', head: 'SaaS & Software', scope: 'business' },
   { pattern: 'TWILIO', head: 'SaaS & Software', scope: 'business' },
