@@ -8,7 +8,7 @@
 
 import { parseIndianDate } from './common.js';
 
-// Android: "12/07/2026, 10:31 pm - Puneet: Sent 50000"
+// Android: "12/07/2026, 10:31 pm - Me: Sent 50000"
 // iOS:     "[12/07/26, 10:31:45 PM] Manish: received 50k"
 const MSG_RE = /^\[?(\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}),? (\d{1,2}:\d{2}(?::\d{2})?\s?(?:am|pm|AM|PM)?)\]?\s*[-–]?\s*([^:]+): ([\s\S]*)$/;
 

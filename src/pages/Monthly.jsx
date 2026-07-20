@@ -2,10 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../lib/store.js';
 import { inr } from '../lib/parsers/common.js';
-import { isInternalHead } from '../lib/selfTransfers.js';
-
-const MANISH_RE = /MANISH TAN|INDBX7971|169599337971|52410602678|INDBR.*MANISH TANDON|JASPREET/i;
-const NOT_MANISH_RE = /SRIVASTA|Manish sri/i;
+import { isInternalHead, tokensToRegex } from '../lib/selfTransfers.js';
 
 function monthLabel(key) {
   const [y, m] = key.split('-');
@@ -67,9 +64,16 @@ export default function Monthly() {
     return Object.values(g).sort((a, b) => b[1] - a[1]).slice(0, 12);
   };
 
-  // Manish month reconciliation
+  // Manish month reconciliation. Partner identity comes from the restored
+  // profile (tokens & account numbers stay in your data, not in this repo).
+  const partnerRe = tokensToRegex(state.profile?.partnerTokens);
+  const excludeRe = tokensToRegex(state.profile?.partnerExclude);
   const manishTxns = txns
-    .filter((t) => (t.head === 'Manish Transfer' || MANISH_RE.test(t.narration || '')) && !NOT_MANISH_RE.test(t.narration || ''))
+    .filter((t) => {
+      const n = t.narration || '';
+      if (excludeRe && excludeRe.test(n)) return false;
+      return t.head === 'Manish Transfer' || (partnerRe && partnerRe.test(n));
+    })
     .sort((a, b) => (a.date < b.date ? -1 : 1));
   const manishOut = sum(manishTxns.filter((t) => t.direction === 'debit'));
   const manishIn = sum(manishTxns.filter((t) => t.direction === 'credit'));
@@ -107,7 +111,7 @@ export default function Monthly() {
           <div className="value">{inr(sum(flows.filter((t) => t.direction === 'debit')))}</div>
         </div>
         <div className="card stat">
-          <div className="label">Manish Tandon — this month</div>
+          <div className="label">Manish — this month</div>
           <div className="value">{inr(manishOut - manishIn)}</div>
           <div className="hint">{inr(manishOut)} out · {inr(manishIn)} back</div>
         </div>
@@ -137,10 +141,10 @@ export default function Monthly() {
       <h2>Where it came from</h2>
       <div className="card"><Bars rows={agg('credit')} color="var(--green)" /></div>
 
-      <h2>Manish Tandon — {monthLabel(m)}</h2>
+      <h2>Manish — {monthLabel(m)}</h2>
       <div className="card">
         {manishTxns.length === 0 ? (
-          <p className="muted">No bank transfers with Manish Tandon this month.</p>
+          <p className="muted">No bank transfers with Manish this month.</p>
         ) : (
           <table>
             <thead><tr><th>Date</th><th>Account</th><th>Dir</th><th className="num">Amount</th><th>Narration</th></tr></thead>

@@ -6,17 +6,22 @@
 // dates within MAX_DAYS — plus an evidence gate checked on EACH leg
 // separately (a debit to some third party must never be swallowed just
 // because its credit-side candidate mentions your own name):
-//   - bank → bank: every leg must reference yourself (name / SWEEP / SELF),
-//     or the other account's number — or both legs must share the same full
-//     UPI handle (id@psp), which only happens for self-payments.
+//   - bank → bank: every leg must reference yourself (profile.ownTokens /
+//     SWEEP / SELF), or the other account's number — or both legs must share
+//     the same full UPI handle (id@psp), which only happens for self-payments.
 //   - bank → card: the credit sits on a card account and reads like a bill
 //     payment; the debit must name the card, the network, or yourself.
-// Manish/Jaspreet rows are never pairable — those are the ledger, not sweeps.
+// Ledger-partner rows (head or profile.partnerTokens) are never pairable —
+// those are the partner ledger, not sweeps.
 
 const MAX_DAYS = 3;
-const OWN_RE = /PUNEET|MAKKHIJA|MAKHIJA|PUNEETH|SWEEP|SELF/i;
 const CARD_PAY_RE = /PAYMENT RECEIVED|THANK ?YOU|PAYMENT-THANK|INDIE PAYMENT|CRED CLUB|CRED[./]|CRED\b|BBPS|AMEX|AMERICAN EXPRESS|SBI ?CARD|INDUSIND CREDIT CARD|CC PAYMENT|CARD PAYMENT|INFINITY/i;
-const NEVER_RE = /MANISH TAN|JASPREET/i;
+
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+export function tokensToRegex(tokens) {
+  const list = (tokens || []).filter(Boolean);
+  return list.length ? new RegExp(list.map(esc).join('|'), 'i') : null;
+}
 
 const EXCLUDED_HEADS = new Set(['Self Transfer', 'Card Bill Payment']);
 
@@ -25,8 +30,8 @@ export function isInternalHead(head) {
   return EXCLUDED_HEADS.has(head);
 }
 
-function pairable(t) {
-  if (NEVER_RE.test(t.narration || '')) return false;
+function pairable(t, neverRe) {
+  if (neverRe && neverRe.test(t.narration || '')) return false;
   if (t.head === 'Manish Transfer') return false;
   // Never repurpose a row a human reviewed under a real spend head.
   if (t.reviewed && t.head && !EXCLUDED_HEADS.has(t.head)) return false;
@@ -43,9 +48,9 @@ function paise(amount) {
 
 // One leg is "self-evidenced" if its narration mentions you or the account
 // on the other end of the hop.
-function selfEvidence(narration, otherAccount) {
+function selfEvidence(narration, otherAccount, ownRe) {
   const n = (narration || '').toUpperCase();
-  if (OWN_RE.test(n)) return true;
+  if (ownRe.test(n)) return true;
   if (otherAccount?.last4 && n.includes(otherAccount.last4)) return true;
   return false;
 }
@@ -65,11 +70,13 @@ function sharedUpiHandle(a, b) {
 }
 
 // Returns { pairs: [{debit, credit, head}], patches: Map<txnId, patch> }.
-export function findSelfTransferPairs(transactions, accounts) {
+export function findSelfTransferPairs(transactions, accounts, profile = {}) {
+  const ownRe = tokensToRegex([...(profile.ownTokens || []), 'SWEEP', 'SELF']);
+  const neverRe = tokensToRegex(profile.partnerTokens);
   const accountsById = Object.fromEntries((accounts || []).map((a) => [a.id, a]));
   const creditsByAmount = new Map();
   for (const t of transactions) {
-    if (t.direction !== 'credit' || !pairable(t)) continue;
+    if (t.direction !== 'credit' || !pairable(t, neverRe)) continue;
     const k = paise(t.amount);
     if (!creditsByAmount.has(k)) creditsByAmount.set(k, []);
     creditsByAmount.get(k).push(t);
@@ -78,7 +85,7 @@ export function findSelfTransferPairs(transactions, accounts) {
   const used = new Set();
   const pairs = [];
   const debits = transactions
-    .filter((t) => t.direction === 'debit' && pairable(t))
+    .filter((t) => t.direction === 'debit' && pairable(t, neverRe))
     .sort((a, b) => (a.date < b.date ? -1 : 1));
 
   for (const d of debits) {
@@ -94,10 +101,10 @@ export function findSelfTransferPairs(transactions, accounts) {
         const dn = (d.narration || '').toUpperCase();
         ok =
           CARD_PAY_RE.test(c.narration || '') &&
-          (CARD_PAY_RE.test(dn) || OWN_RE.test(dn) || (creditAcct.last4 && dn.includes(creditAcct.last4)));
+          (CARD_PAY_RE.test(dn) || ownRe.test(dn) || (creditAcct.last4 && dn.includes(creditAcct.last4)));
       } else {
         ok =
-          (selfEvidence(d.narration, creditAcct) && selfEvidence(c.narration, debitAcct)) ||
+          (selfEvidence(d.narration, creditAcct, ownRe) && selfEvidence(c.narration, debitAcct, ownRe)) ||
           sharedUpiHandle(d.narration, c.narration);
       }
       if (!ok) continue;

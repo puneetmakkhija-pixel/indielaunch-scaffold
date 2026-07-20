@@ -2,8 +2,8 @@
 // Scope can always be overridden per-transaction.
 export const HEADS = [
   { name: 'Investor Tranche In', scope: 'business', credit: true },
-  { name: 'Salary (BuddyLoan)', scope: 'personal', credit: true },
-  { name: 'DSA Commission (BuddyLoan)', scope: 'business', credit: true },
+  { name: 'Salary', scope: 'personal', credit: true },
+  { name: 'DSA Commission', scope: 'business', credit: true },
   { name: 'Sub-DSA Investment', scope: 'business' },
   { name: 'Revenue / Client Payment', scope: 'business', credit: true },
   { name: 'Refund / Reversal', scope: null, credit: true },
@@ -92,40 +92,23 @@ export const DEFAULT_RULES = [
   { pattern: 'CRED CLUB', head: 'Card Bill Payment', scope: null },
   { pattern: 'CC PAYMENT', head: 'Card Bill Payment', scope: null },
   { pattern: 'CREDIT CARD PAYMENT', head: 'Card Bill Payment', scope: null },
-  // Two different Manishes exist in these statements — only Manish Tandon is
-  // the ledger partner; Manish Srivastav is a separate payee.
-  { pattern: 'MANISH TAN', head: 'Manish Transfer', scope: 'business' },
-  // Jaspreet Kaur = Manish-side; payments to her count as returns to Manish.
-  { pattern: 'JASPREET', head: 'Manish Transfer', scope: 'business' },
   { pattern: 'SWEEP TRANSFER TO', head: 'Self Transfer', scope: null },
   { pattern: 'SWEEP TRF FROM', head: 'Self Transfer', scope: null },
   { pattern: 'FD PREMAT PROCEEDS', head: 'Self Transfer', scope: null },
-  // BVALUE = BuddyLoan: salary when it lands in the personal IndusInd account,
-  // DSA commission when it lands in Cube Finserve's Kotak account.
-  { pattern: 'BVALUE', accountId: 'indusind', head: 'Salary (BuddyLoan)', scope: 'personal' },
-  { pattern: 'BVALUE SERVICES', head: 'DSA Commission (BuddyLoan)', scope: 'business' },
-  // Udyami Fin + Sarabjeet = one sub-DSA entity; deployments of Manish's money.
-  { pattern: 'UDYAMI FIN', head: 'Sub-DSA Investment', scope: 'business' },
-  { pattern: 'SARABJEET', head: 'Sub-DSA Investment', scope: 'business' },
   { pattern: 'ETAX GSTN', head: 'GST / Taxes', scope: 'business' },
-  { pattern: 'JDS ENTERPRISES', head: 'Vendor Payment', scope: 'business' },
-  { pattern: 'AEROCHAP', head: 'Vendor Payment', scope: 'business' },
-  { pattern: 'INCLINE AERO', head: 'Vendor Payment', scope: 'business' },
   { pattern: 'BSES', head: 'Utilities & Telecom', scope: 'business' },
   { pattern: 'ANTHROPIC', head: 'SaaS & Software', scope: 'business' },
   { pattern: 'ZOHO', head: 'SaaS & Software', scope: 'business' },
   { pattern: 'TWILIO', head: 'SaaS & Software', scope: 'business' },
   { pattern: 'MICROSOFT', head: 'SaaS & Software', scope: 'business' },
   { pattern: 'GOOGLE WORKSPACE', head: 'SaaS & Software', scope: 'business' },
-  // Deepika Makhija = wife; transfers to her Karnataka Bank / IndusInd
-  // accounts (and her UPI handle) are the household budget.
-  { pattern: 'DEEPIKA MAKHIJA', head: 'Household (Wife)', scope: 'personal' },
-  { pattern: '899020310@PT', head: 'Household (Wife)', scope: 'personal' },
 ].map((r, i) => ({ id: 'default-' + i, builtin: true, ...r }));
+// Person-specific rules (your employer, ledger partner, family, vendors) are
+// data, not code: they live in your restored backup, never in this repo.
 
 // Apply the first matching rule to a transaction. Rules may be scoped to one
-// account via rule.accountId (e.g. BVALUE = salary only in the IndusInd
-// account). Returns {head, scope} or null.
+// account via rule.accountId (e.g. the same payer can mean salary in one
+// account and commission in another). Returns {head, scope} or null.
 export function applyRules(narration, rules, accountId = null) {
   const hay = (narration || '').toUpperCase();
   for (const r of rules) {

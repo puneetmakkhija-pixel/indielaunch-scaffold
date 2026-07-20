@@ -19,7 +19,7 @@ test('Kotak CSV: timestamped dates and Dr-signed balance column', () => {
   const csv = [
     '"Sl. No.","Transaction Date","Value Date","Description","Chq /Ref No.","Amount","Dr / Cr","Balance","Dr / Cr"',
     '"1","20-01-2026 16:35:49","20-01-2026","BRB:Sent RTGS GST/RESERVE","000508","3,00,000.00","DR","1,96,175.00","DR"',
-    '"2","21-01-2026 14:35:44","21-01-2026","NEFT BVALUE SERVICES PRIVATE LIM","NEFT-1","12,36,325.00","CR","12,58,660.00","CR"',
+    '"2","21-01-2026 14:35:44","21-01-2026","NEFT ACME CORP PRIVATE LIM","NEFT-1","12,36,325.00","CR","12,58,660.00","CR"',
   ].join('\n');
   const out = parseCsvStatement(csv);
   assert.equal(out.length, 2);
@@ -95,14 +95,14 @@ test('IndusInd CSV: Particulars + Withdrawal/Deposit', () => {
 
 test('WhatsApp: Android + iOS formats, English + Hinglish, cash detection', () => {
   const chat = [
-    '12/07/2026, 10:31 pm - Puneet: Sent 50000 to your HDFC just now',
+    '12/07/2026, 10:31 pm - Arjun: Sent 50000 to your HDFC just now',
     '13/07/2026, 9:00 am - Manish: bhej diya 25k for vendor',
-    '14/07/2026, 6:15 pm - Puneet: cash de diya ₹30,000 haath me',
-    '[16/07/26, 11:20:45 AM] Puneet: transferred rs 2,50,000 tranche use',
+    '14/07/2026, 6:15 pm - Arjun: cash de diya ₹30,000 haath me',
+    '[16/07/26, 11:20:45 AM] Arjun: transferred rs 2,50,000 tranche use',
     '15/07/2026, 1:00 pm - Manish: received 1 lakh, will pay vendor at 5 pm',
     '16/07/2026, 2:00 pm - Manish: meeting at 3 tomorrow',
   ].join('\n');
-  const { claims } = parseWhatsAppChat(chat, 'Puneet');
+  const { claims } = parseWhatsAppChat(chat, 'Arjun');
   assert.equal(claims.length, 5);
   assert.deepEqual(
     claims.map((c) => [c.direction, c.amount, c.mode]),
