@@ -10,6 +10,7 @@ import Accounts from './pages/Accounts.jsx';
 import Analysis from './pages/Analysis.jsx';
 import LoansCards from './pages/LoansCards.jsx';
 import Save from './pages/Save.jsx';
+import Monthly from './pages/Monthly.jsx';
 
 export default function App() {
   const state = useStore();
@@ -24,6 +25,7 @@ export default function App() {
           </div>
           <nav>
             <NavLink to="/" end>Dashboard</NavLink>
+            <NavLink to="/monthly">Monthly Recon</NavLink>
             <NavLink to="/import">Import</NavLink>
             <NavLink to="/transactions">
               Transactions
@@ -41,6 +43,7 @@ export default function App() {
         <main className="main">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/monthly" element={<Monthly />} />
             <Route path="/import" element={<ImportPage />} />
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/analysis" element={<Analysis />} />
