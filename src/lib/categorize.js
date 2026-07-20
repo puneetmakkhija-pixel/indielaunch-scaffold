@@ -94,6 +94,8 @@ export const DEFAULT_RULES = [
   // Two different Manishes exist in these statements — only Manish Tandon is
   // the ledger partner; Manish Srivastav is a separate payee.
   { pattern: 'MANISH TAN', head: 'Manish Transfer', scope: 'business' },
+  // Jaspreet Kaur = Manish-side; payments to her count as returns to Manish.
+  { pattern: 'JASPREET', head: 'Manish Transfer', scope: 'business' },
   { pattern: 'SWEEP TRANSFER TO', head: 'Self Transfer', scope: null },
   { pattern: 'SWEEP TRF FROM', head: 'Self Transfer', scope: null },
   { pattern: 'FD PREMAT PROCEEDS', head: 'Self Transfer', scope: null },

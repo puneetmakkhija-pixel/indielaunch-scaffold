@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useStore } from '../lib/store.js';
 import { inr } from '../lib/parsers/common.js';
 
-const MANISH_RE = /MANISH TAN|INDBX7971|169599337971|52410602678|INDBR.*MANISH TANDON/i;
+const MANISH_RE = /MANISH TAN|INDBX7971|169599337971|52410602678|INDBR.*MANISH TANDON|JASPREET/i;
 const NOT_MANISH_RE = /SRIVASTA|Manish sri/i;
 
 function monthLabel(key) {
