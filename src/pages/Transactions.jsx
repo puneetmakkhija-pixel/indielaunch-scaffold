@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useStore, tagTransaction, updateTransaction, deleteTransaction, addManualTransaction, detectSelfTransfers } from '../lib/store.js';
+import { useStore, tagTransaction, updateTransaction, deleteTransaction, addManualTransaction, detectSelfTransfers, reviewTransactions } from '../lib/store.js';
 import { HEAD_NAMES, defaultScopeForHead, guessMerchantToken } from '../lib/categorize.js';
 import { suggestTag } from '../lib/suggest.js';
 import { inr2 } from '../lib/parsers/common.js';
@@ -100,6 +100,7 @@ export default function Transactions() {
   const [editing, setEditing] = useState(null);
   const [showManual, setShowManual] = useState(false);
   const [pairMsg, setPairMsg] = useState('');
+  const [selected, setSelected] = useState(() => new Set());
 
   function matchPairs() {
     const n = detectSelfTransfers();
@@ -141,6 +142,26 @@ export default function Transactions() {
 
   function confirmAuto(t) {
     updateTransaction(t.id, { reviewed: true });
+  }
+
+  // Selection covers ALL filtered rows (not just the 300 shown), so
+  // "select all → approve" clears an entire slice in one go.
+  const allSelected = txns.length > 0 && txns.every((t) => selected.has(t.id));
+  function toggleAll() {
+    setSelected(allSelected ? new Set() : new Set(txns.map((t) => t.id)));
+  }
+  function toggleOne(id) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+  function approveSelected() {
+    const n = reviewTransactions([...selected]);
+    setSelected(new Set());
+    setPairMsg(n + ' transaction' + (n > 1 ? 's' : '') + ' approved.');
   }
 
   return (
@@ -188,6 +209,11 @@ export default function Transactions() {
             {HEAD_NAMES.map((h) => <option key={h} value={h}>{h}</option>)}
           </select>
           <input placeholder="Search narration…" value={search} onChange={(e) => setSearch(e.target.value)} style={{ flex: 1, minWidth: 160 }} />
+          {selected.size > 0 && (
+            <button onClick={approveSelected} title="Mark all selected transactions as reviewed/approved">
+              ✓ Approve {selected.size} selected
+            </button>
+          )}
         </div>
 
         {txns.length === 0 ? (
@@ -197,6 +223,9 @@ export default function Transactions() {
             <table>
               <thead>
                 <tr>
+                  <th style={{ width: 28 }}>
+                    <input type="checkbox" checked={allSelected} onChange={toggleAll} title={'Select all ' + txns.length + ' filtered transactions'} />
+                  </th>
                   <th>Date</th><th>Account</th><th>Narration</th><th>Head</th><th>Scope</th><th className="num">Amount</th><th></th>
                 </tr>
               </thead>
@@ -204,6 +233,9 @@ export default function Transactions() {
                 {txns.slice(0, 300).map((t) => (
                   <>
                     <tr key={t.id}>
+                      <td>
+                        <input type="checkbox" checked={selected.has(t.id)} onChange={() => toggleOne(t.id)} />
+                      </td>
                       <td style={{ whiteSpace: 'nowrap' }}>{t.date}</td>
                       <td className="muted" style={{ whiteSpace: 'nowrap' }}>{accountsById[t.accountId]?.label || '?'}</td>
                       <td style={{ maxWidth: 340, overflowWrap: 'anywhere' }}>{t.narration}</td>
@@ -237,7 +269,7 @@ export default function Transactions() {
                     </tr>
                     {editing === t.id && (
                       <tr key={t.id + '-edit'}>
-                        <td colSpan={7} style={{ background: 'transparent' }}>
+                        <td colSpan={8} style={{ background: 'transparent' }}>
                           <TagEditor txn={t} onDone={() => setEditing(null)} />
                         </td>
                       </tr>

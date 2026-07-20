@@ -154,6 +154,15 @@ export function detectSelfTransfers() {
   return matched;
 }
 
+// Bulk-approve: mark many transactions reviewed in one state update.
+export function reviewTransactions(ids) {
+  const set = new Set(ids);
+  setState((s) => ({
+    transactions: s.transactions.map((t) => (set.has(t.id) ? { ...t, reviewed: true } : t)),
+  }));
+  return set.size;
+}
+
 export function updateTransaction(id, patch) {
   setState((s) => ({
     transactions: s.transactions.map((t) => (t.id === id ? { ...t, ...patch } : t)),
