@@ -83,17 +83,18 @@ test('bounce, EMI and recurring detection', () => {
   assert.equal(netflix.count, 2);
 });
 
-test('account-scoped rules: BVALUE is salary in IndusInd, commission in Kotak', async () => {
-  const { applyRules, DEFAULT_RULES } = await import('../src/lib/categorize.js');
-  const indus = applyRules('N/HDFCH00770737490/HDFC0000240/BVALUE SERVICES PVT', DEFAULT_RULES, 'indusind');
-  assert.equal(indus.head, 'Salary (BuddyLoan)');
+test('account-scoped rules: the same payer can be salary in one account, commission in another', async () => {
+  const { applyRules } = await import('../src/lib/categorize.js');
+  // Fictional employer; person-specific rules like these live in user data.
+  const rules = [
+    { id: 'r1', pattern: 'ACME CORP', accountId: 'indusind', head: 'Salary', scope: 'personal' },
+    { id: 'r2', pattern: 'ACME CORP', head: 'DSA Commission', scope: 'business' },
+  ];
+  const indus = applyRules('N/HDFCH00770737490/HDFC0000240/ACME CORP PVT', rules, 'indusind');
+  assert.equal(indus.head, 'Salary');
   assert.equal(indus.scope, 'personal');
-  const kotak = applyRules('IFT-BVALUE SERVICES PRIVATE L-FCM-260702NS2MJ2', DEFAULT_RULES, 'kotak');
-  assert.equal(kotak.head, 'DSA Commission (BuddyLoan)');
-  const udyami = applyRules('SentIMPS618616501765UDYAMI FIN/AUBLX4373/KKBKTrans', DEFAULT_RULES, 'kotak');
-  assert.equal(udyami.head, 'Sub-DSA Investment');
-  const sarab = applyRules('MB: SENT TO SARABJEET SINGH', DEFAULT_RULES, 'kotak');
-  assert.equal(sarab.head, 'Sub-DSA Investment');
+  const kotak = applyRules('IFT-ACME CORP PRIVATE L-FCM-260702NS2MJ2', rules, 'kotak');
+  assert.equal(kotak.head, 'DSA Commission');
 });
 
 test('suggestTag: untagged transaction inherits head of similar tagged one', () => {

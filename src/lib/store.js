@@ -5,27 +5,23 @@ import PREFILL from '../data/prefill.json';
 
 const KEY = 'munshi_state_v1';
 
+// The repo ships no personal data: accounts, emails, person-specific rules
+// and the profile all arrive via prefill.json (local only) or backup restore.
 const emptyState = {
   accounts: [
     { id: 'cash', label: 'Cash in hand', bank: 'Cash', last4: '', email: '', type: 'cash' },
-    { id: 'hdfc', label: 'HDFC Savings (primary)', bank: 'HDFC', last4: '9780', email: 'puneetmakkhija@gmail.com', type: 'bank' },
-    { id: 'indusind', label: 'IndusInd Select (personal)', bank: 'IndusInd', last4: '6786', email: 'puneetmakkhija@gmail.com', type: 'bank' },
-    { id: 'indusind-cc', label: 'IndusInd Credit Card', bank: 'IndusInd', last4: '8829', email: 'puneetmakkhija@gmail.com', type: 'card' },
-    { id: 'amex-plat', label: 'Amex Platinum charge', bank: 'American Express', last4: '1008', email: 'puneetmakkhija@gmail.com', type: 'card', dueDay: 11 },
-    { id: 'amex-reserve', label: 'Amex Platinum Reserve', bank: 'American Express', last4: '1004', email: 'puneetmakkhija@gmail.com', type: 'card', limit: 586000, dueDay: 10 },
-    { id: 'sbi-paytm', label: 'Paytm SBI Card', bank: 'SBI Card', last4: '0899', email: 'puneet.borntolead@gmail.com', type: 'card', limit: 40000, dueDay: 4 },
-    { id: 'kotak', label: 'Kotak — Cube Finserve (Manish co., DSA of BuddyLoan)', bank: 'Kotak', last4: '4444', email: 'puneetmakkhija@gmail.com', type: 'bank' },
   ],
   transactions: [],
   rules: DEFAULT_RULES,
   tranches: [],
   manishClaims: [],
   loans: [],
-  emails: [
-    { id: 'email-primary', address: 'puneetmakkhija@gmail.com', label: 'Personal' },
-    { id: 'email-alt', address: 'puneet.borntolead@gmail.com', label: 'Personal (alt)' },
-    { id: 'email-work', address: 'puneet.makhija@buddyloan.com', label: 'Work (BuddyLoan)' },
-  ],
+  emails: [],
+  // profile powers narration matching without names in code:
+  //   ownTokens      — substrings that identify YOU in a narration
+  //   partnerTokens  — substrings that identify the ledger partner's side
+  //   partnerExclude — lookalikes to ignore (e.g. someone sharing a name)
+  profile: { ownTokens: [], partnerTokens: [], partnerExclude: [] },
 };
 
 function load() {
@@ -136,7 +132,7 @@ export function importTransactions(accountId, parsed, source) {
     // The same rupee lands twice when it moves between own accounts — debit
     // in the source statement, credit in the destination one. Pair them up
     // front so totals never double-count internal movements.
-    const { patches } = findSelfTransferPairs(transactions, s.accounts);
+    const { patches } = findSelfTransferPairs(transactions, s.accounts, s.profile);
     if (patches.size) {
       transactions = transactions.map((t) => (patches.has(t.id) ? { ...t, ...patches.get(t.id) } : t));
     }
@@ -150,7 +146,7 @@ export function importTransactions(accountId, parsed, source) {
 export function detectSelfTransfers() {
   let matched = 0;
   setState((s) => {
-    const { pairs, patches } = findSelfTransferPairs(s.transactions, s.accounts);
+    const { pairs, patches } = findSelfTransferPairs(s.transactions, s.accounts, s.profile);
     matched = pairs.length;
     if (!patches.size) return {};
     return { transactions: s.transactions.map((t) => (patches.has(t.id) ? { ...t, ...patches.get(t.id) } : t)) };

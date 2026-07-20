@@ -11,7 +11,7 @@ import { inr } from '../lib/parsers/common.js';
 
 export default function Manish() {
   const state = useStore();
-  const [myName, setMyName] = useState('Puneet');
+  const [myName, setMyName] = useState('');
   const [error, setError] = useState('');
   const [lastImport, setLastImport] = useState(null);
   const [claimForm, setClaimForm] = useState({ date: new Date().toISOString().slice(0, 10), direction: 'to_manish', amount: '', mode: 'cash', text: '' });
