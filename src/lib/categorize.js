@@ -27,6 +27,7 @@ export const HEADS = [
   { name: 'Utilities & Telecom', scope: 'personal' },
   { name: 'Entertainment & OTT', scope: 'personal' },
   { name: 'Medical & Health', scope: 'personal' },
+  { name: 'Household (Wife)', scope: 'personal' },
   { name: 'Family & Gifts', scope: 'personal' },
   { name: 'EMI & Loans', scope: 'personal' },
   { name: 'Insurance', scope: 'personal' },
@@ -116,7 +117,10 @@ export const DEFAULT_RULES = [
   { pattern: 'TWILIO', head: 'SaaS & Software', scope: 'business' },
   { pattern: 'MICROSOFT', head: 'SaaS & Software', scope: 'business' },
   { pattern: 'GOOGLE WORKSPACE', head: 'SaaS & Software', scope: 'business' },
-  { pattern: 'DEEPIKA MAKHIJA', head: 'Family & Gifts', scope: 'personal' },
+  // Deepika Makhija = wife; transfers to her Karnataka Bank / IndusInd
+  // accounts (and her UPI handle) are the household budget.
+  { pattern: 'DEEPIKA MAKHIJA', head: 'Household (Wife)', scope: 'personal' },
+  { pattern: '899020310@PT', head: 'Household (Wife)', scope: 'personal' },
 ].map((r, i) => ({ id: 'default-' + i, builtin: true, ...r }));
 
 // Apply the first matching rule to a transaction. Rules may be scoped to one

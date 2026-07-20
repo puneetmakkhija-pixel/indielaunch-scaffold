@@ -1,5 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { DEFAULT_RULES, applyRules, defaultScopeForHead } from './categorize.js';
+import { findSelfTransferPairs } from './selfTransfers.js';
+import PREFILL from '../data/prefill.json';
 
 const KEY = 'munshi_state_v1';
 
@@ -29,7 +31,10 @@ const emptyState = {
 function load() {
   try {
     const raw = localStorage.getItem(KEY);
-    if (!raw) return structuredClone(emptyState);
+    // First run: hydrate from the bundled prefill (statements, accounts,
+    // loans, chat claims parsed up-front). Rules always come from code so
+    // new builtin rules apply immediately.
+    if (!raw) return { ...structuredClone(emptyState), ...structuredClone(PREFILL) };
     const parsed = JSON.parse(raw);
     return { ...structuredClone(emptyState), ...parsed };
   } catch {
@@ -127,10 +132,30 @@ export function importTransactions(accountId, parsed, source) {
       fresh.push(t);
       added++;
     }
-    const transactions = [...s.transactions, ...fresh].sort((a, b) => (a.date < b.date ? 1 : -1));
+    let transactions = [...s.transactions, ...fresh].sort((a, b) => (a.date < b.date ? 1 : -1));
+    // The same rupee lands twice when it moves between own accounts — debit
+    // in the source statement, credit in the destination one. Pair them up
+    // front so totals never double-count internal movements.
+    const { patches } = findSelfTransferPairs(transactions, s.accounts);
+    if (patches.size) {
+      transactions = transactions.map((t) => (patches.has(t.id) ? { ...t, ...patches.get(t.id) } : t));
+    }
     return { transactions };
   });
   return { added, skipped };
+}
+
+// Re-run A→B pair detection over the full ledger (e.g. after restoring an
+// older backup). Returns the number of pairs found.
+export function detectSelfTransfers() {
+  let matched = 0;
+  setState((s) => {
+    const { pairs, patches } = findSelfTransferPairs(s.transactions, s.accounts);
+    matched = pairs.length;
+    if (!patches.size) return {};
+    return { transactions: s.transactions.map((t) => (patches.has(t.id) ? { ...t, ...patches.get(t.id) } : t)) };
+  });
+  return matched;
 }
 
 export function updateTransaction(id, patch) {
