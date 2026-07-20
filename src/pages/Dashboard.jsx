@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useStore } from '../lib/store.js';
 import { inr } from '../lib/parsers/common.js';
 import { manishLedger } from '../lib/reconcile.js';
+import { isInternalHead } from '../lib/selfTransfers.js';
 
 function monthKey(date) {
   return date.slice(0, 7);
@@ -27,13 +28,14 @@ export default function Dashboard() {
   const credits = txns.filter((t) => t.direction === 'credit');
   const sum = (arr) => arr.reduce((a, t) => a + t.amount, 0);
 
-  const bizSpend = sum(debits.filter((t) => t.scope === 'business' && t.head !== 'Manish Transfer' && t.head !== 'Self Transfer'));
+  const bizSpend = sum(debits.filter((t) => t.scope === 'business' && t.head !== 'Manish Transfer' && !isInternalHead(t.head)));
   const perSpend = sum(debits.filter((t) => t.scope === 'personal'));
-  const unscoped = sum(debits.filter((t) => !t.scope && t.head !== 'Self Transfer'));
+  const unscoped = sum(debits.filter((t) => !t.scope && !isInternalHead(t.head)));
   const trancheIn = sum(credits.filter((t) => t.head === 'Investor Tranche In'));
 
   const byHead = {};
   for (const t of debits) {
+    if (isInternalHead(t.head)) continue; // same rupee already counted where it was actually spent
     const h = t.head || '— Untagged —';
     byHead[h] = (byHead[h] || 0) + t.amount;
   }
@@ -86,7 +88,7 @@ export default function Dashboard() {
       <div className="grid cols-3">
         <div className="card stat">
           <div className="label">Money in — {monthLabel(active)}</div>
-          <div className="value pos">{inr(sum(credits))}</div>
+          <div className="value pos">{inr(sum(credits.filter((t) => !isInternalHead(t.head))))}</div>
           {trancheIn > 0 && <div className="hint">incl. {inr(trancheIn)} investor tranches</div>}
         </div>
         <div className="card stat">

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../lib/store.js';
 import { inr } from '../lib/parsers/common.js';
+import { isInternalHead } from '../lib/selfTransfers.js';
 
 const MANISH_RE = /MANISH TAN|INDBX7971|169599337971|52410602678|INDBR.*MANISH TANDON|JASPREET/i;
 const NOT_MANISH_RE = /SRIVASTA|Manish sri/i;
@@ -52,8 +53,9 @@ export default function Monthly() {
     return Object.entries(map).sort((a, b) => (b[1].in + b[1].out) - (a[1].in + a[1].out));
   }, [txns]);
 
-  // spend & income by head (sweeps excluded)
-  const flows = txns.filter((t) => t.head !== 'Self Transfer');
+  // spend & income by head (internal movements excluded — sweeps, A→B self
+  // transfers and card bill payments are the same rupee counted twice)
+  const flows = txns.filter((t) => !isInternalHead(t.head));
   const agg = (dir) => {
     const g = {};
     for (const t of flows.filter((t) => t.direction === dir)) {
@@ -98,7 +100,7 @@ export default function Monthly() {
         <div className="card stat">
           <div className="label">Money in — {monthLabel(m)}</div>
           <div className="value pos">{inr(sum(flows.filter((t) => t.direction === 'credit')))}</div>
-          <div className="hint">sweeps excluded</div>
+          <div className="hint">self transfers & card bill payments excluded</div>
         </div>
         <div className="card stat">
           <div className="label">Money out</div>

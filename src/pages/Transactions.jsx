@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useStore, tagTransaction, updateTransaction, deleteTransaction, addManualTransaction } from '../lib/store.js';
+import { useStore, tagTransaction, updateTransaction, deleteTransaction, addManualTransaction, detectSelfTransfers } from '../lib/store.js';
 import { HEAD_NAMES, defaultScopeForHead, guessMerchantToken } from '../lib/categorize.js';
 import { suggestTag } from '../lib/suggest.js';
 import { inr2 } from '../lib/parsers/common.js';
@@ -99,6 +99,12 @@ export default function Transactions() {
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState(null);
   const [showManual, setShowManual] = useState(false);
+  const [pairMsg, setPairMsg] = useState('');
+
+  function matchPairs() {
+    const n = detectSelfTransfers();
+    setPairMsg(n === 0 ? 'No A→B pairs found.' : n + ' internal transfer pair' + (n > 1 ? 's' : '') + ' matched — counted once now.');
+  }
 
   const accountsById = useMemo(
     () => Object.fromEntries(state.accounts.map((a) => [a.id, a])),
@@ -144,8 +150,14 @@ export default function Transactions() {
           <h1>Transactions</h1>
           <p className="sub">Review, tag under spend heads, and bifurcate business vs personal.</p>
         </div>
-        <button onClick={() => setShowManual(!showManual)}>+ Manual / cash entry</button>
+        <div className="row">
+          <button className="secondary" onClick={matchPairs} title="Pair debits & credits that are the same money moving between your own accounts (incl. card bill payments) so they never count twice">
+            Match A→B transfers
+          </button>
+          <button onClick={() => setShowManual(!showManual)}>+ Manual / cash entry</button>
+        </div>
       </div>
+      {pairMsg && <div className="notice">{pairMsg}</div>}
 
       {showManual && <ManualEntry accounts={state.accounts} onClose={() => setShowManual(false)} />}
 

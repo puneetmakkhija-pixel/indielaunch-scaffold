@@ -12,6 +12,7 @@ import {
   addManishClaims, updateManishClaim, removeManishClaim,
   addLoan, updateLoan, removeLoan,
   addEmail, removeEmail,
+  detectSelfTransfers,
   exportAll, importAll,
 } from './store.js';
 import { applyRules, guessMerchantToken, HEAD_NAMES } from './categorize.js';
@@ -38,6 +39,7 @@ const munshi = {
     addManishClaims, updateManishClaim, removeManishClaim,
     addLoan, updateLoan, removeLoan,
     addEmail, removeEmail,
+    detectSelfTransfers,
     importAll,
   },
 
