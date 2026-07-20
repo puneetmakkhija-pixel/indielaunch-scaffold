@@ -42,7 +42,7 @@ export default function Dashboard() {
   const headRows = Object.entries(byHead).sort((a, b) => b[1] - a[1]);
   const maxHead = headRows[0]?.[1] || 1;
 
-  const unreviewed = state.transactions.filter((t) => !t.reviewed).length;
+  const untagged = state.transactions.filter((t) => !t.head).length;
   const ledger = manishLedger(state.manishClaims, state.transactions);
 
   if (!state.transactions.length) {
@@ -78,9 +78,9 @@ export default function Dashboard() {
         </select>
       </div>
 
-      {unreviewed > 0 && (
+      {untagged > 0 && (
         <div className="notice">
-          {unreviewed} transaction{unreviewed > 1 ? 's' : ''} waiting for review —{' '}
+          {untagged} transaction{untagged > 1 ? 's' : ''} still untagged —{' '}
           <Link to="/transactions">tag them now</Link> so your split stays accurate.
         </div>
       )}
