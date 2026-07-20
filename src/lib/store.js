@@ -267,5 +267,20 @@ export function exportAll() {
 
 export function importAll(json) {
   const parsed = JSON.parse(json);
-  setState(() => ({ ...structuredClone(emptyState), ...parsed }));
+  setState(() => {
+    const next = { ...structuredClone(emptyState), ...parsed };
+    // A restore should leave no work behind that the app can do itself:
+    // auto-tag anything untagged with the restored rules, then pair A→B
+    // self transfers so both legs of own-account moves land as internal.
+    next.transactions = (next.transactions || []).map((t) => {
+      if (t.head) return t;
+      const m = applyRules(t.narration, next.rules, t.accountId);
+      return m ? { ...t, head: m.head, scope: m.scope, autoTagged: true } : t;
+    });
+    const { patches } = findSelfTransferPairs(next.transactions, next.accounts, next.profile);
+    if (patches.size) {
+      next.transactions = next.transactions.map((t) => (patches.has(t.id) ? { ...t, ...patches.get(t.id) } : t));
+    }
+    return next;
+  });
 }

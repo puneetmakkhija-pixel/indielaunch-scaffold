@@ -91,7 +91,7 @@ function ManualEntry({ accounts, onClose }) {
 
 export default function Transactions() {
   const state = useStore();
-  const [filter, setFilter] = useState('unreviewed');
+  const [filter, setFilter] = useState('untagged');
   const [scopeFilter, setScopeFilter] = useState('');
   const [accountFilter, setAccountFilter] = useState('');
   const [dirFilter, setDirFilter] = useState('');
@@ -129,8 +129,8 @@ export default function Transactions() {
   }
 
   const txns = state.transactions.filter((t) => {
-    if (filter === 'unreviewed' && t.reviewed) return false;
     if (filter === 'untagged' && t.head) return false;
+    if (filter === 'auto' && !(t.autoTagged && !t.reviewed)) return false;
     if (scopeFilter && t.scope !== scopeFilter) return false;
     if (accountFilter && t.accountId !== accountFilter) return false;
     if (dirFilter && t.direction !== dirFilter) return false;
@@ -164,8 +164,8 @@ export default function Transactions() {
       <div className="card">
         <div className="row" style={{ marginBottom: '0.75rem' }}>
           <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-            <option value="unreviewed">Needs review</option>
-            <option value="untagged">Untagged only</option>
+            <option value="untagged">Needs tagging (untagged)</option>
+            <option value="auto">Auto-tagged — confirm</option>
             <option value="all">All</option>
           </select>
           <select value={scopeFilter} onChange={(e) => setScopeFilter(e.target.value)}>
