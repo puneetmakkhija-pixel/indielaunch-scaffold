@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useStore, addAccount, removeAccount, addEmail, removeEmail, exportAll, importAll } from '../lib/store.js';
 
 function EmailRegistry({ emails, accounts }) {
@@ -56,6 +56,7 @@ function EmailRegistry({ emails, accounts }) {
 
 export default function Accounts() {
   const state = useStore();
+  const restoreRef = useRef(null);
   const [form, setForm] = useState({ label: '', bank: '', last4: '', email: '' });
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
@@ -146,10 +147,8 @@ export default function Accounts() {
         </p>
         <div className="row">
           <button onClick={downloadBackup}>Download backup (.json)</button>
-          <label className="secondary" style={{ display: 'inline-block' }}>
-            <button className="secondary" style={{ pointerEvents: 'none' }}>Restore from backup…</button>
-            <input type="file" accept="application/json" style={{ display: 'none' }} onChange={(e) => e.target.files[0] && restoreBackup(e.target.files[0])} />
-          </label>
+          <button className="secondary" onClick={() => restoreRef.current && restoreRef.current.click()}>Restore from backup…</button>
+          <input ref={restoreRef} type="file" accept=".json,application/json" style={{ display: 'none' }} onChange={(e) => e.target.files[0] && restoreBackup(e.target.files[0])} />
         </div>
       </div>
 
