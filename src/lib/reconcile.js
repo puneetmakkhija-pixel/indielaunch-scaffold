@@ -37,7 +37,9 @@ export function autoMatchClaims(claims, transactions, windowDays = 4) {
 
 // Net position: positive = Manish owes you (you sent more than you received).
 export function manishLedger(claims, transactions) {
-  const bankTxns = transactions.filter((t) => t.head === 'Manish Transfer');
+  // manishSide marks rows that belong to the Manish ledger even when tagged
+  // under another head (e.g. verified client credits tagged Investor Tranche In).
+  const bankTxns = transactions.filter((t) => t.head === 'Manish Transfer' || t.manishSide);
   const matchedTxnIds = new Set(claims.map((c) => c.matchedTxnId).filter(Boolean));
 
   let sent = 0;
