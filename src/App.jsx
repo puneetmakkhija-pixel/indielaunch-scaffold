@@ -1,5 +1,6 @@
+import { useEffect } from 'react';
 import { HashRouter, Routes, Route, NavLink } from 'react-router-dom';
-import { useStore } from './lib/store.js';
+import { useStore, detectSelfTransfers } from './lib/store.js';
 import Dashboard from './pages/Dashboard.jsx';
 import ImportPage from './pages/Import.jsx';
 import Transactions from './pages/Transactions.jsx';
@@ -16,6 +17,10 @@ import Assistant from './components/Assistant.jsx';
 export default function App() {
   const state = useStore();
   const unreviewed = state.transactions.filter((t) => !t.reviewed).length;
+
+  // Settle transfers between your own accounts automatically on every load,
+  // so internal movements never need a manual "match" click.
+  useEffect(() => { detectSelfTransfers(); }, []);
 
   return (
     <HashRouter>

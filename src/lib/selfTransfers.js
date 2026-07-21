@@ -69,6 +69,16 @@ function sharedUpiHandle(a, b) {
   return false;
 }
 
+// Both legs of one UPI/IMPS transfer carry the same 12+ digit reference (RRN).
+// If that exact reference appears in both narrations, they are two legs of the
+// same transfer — a high-precision internal-transfer signal that needs no name.
+function sharedNumericRef(a, b) {
+  const A = (a || '').match(/\d{12,}/g) || [];
+  if (!A.length) return false;
+  const B = new Set((b || '').match(/\d{12,}/g) || []);
+  return A.some((r) => B.has(r));
+}
+
 // Returns { pairs: [{debit, credit, head}], patches: Map<txnId, patch> }.
 export function findSelfTransferPairs(transactions, accounts, profile = {}) {
   const ownRe = tokensToRegex([...(profile.ownTokens || []), 'SWEEP', 'SELF']);
@@ -105,7 +115,8 @@ export function findSelfTransferPairs(transactions, accounts, profile = {}) {
       } else {
         ok =
           (selfEvidence(d.narration, creditAcct, ownRe) && selfEvidence(c.narration, debitAcct, ownRe)) ||
-          sharedUpiHandle(d.narration, c.narration);
+          sharedUpiHandle(d.narration, c.narration) ||
+          sharedNumericRef(d.narration, c.narration);
       }
       if (!ok) continue;
       used.add(d.id);
