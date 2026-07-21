@@ -159,6 +159,30 @@ export function detectSelfTransfers() {
   return matched;
 }
 
+// Tag every transaction whose narration contains `text` with `patch`
+// (e.g. { head, scope, manishSide }). Optionally remember it as a rule so
+// future imports tag the same way. Returns the number of rows changed.
+export function bulkTagByText(text, patch, { addRuleToo = false } = {}) {
+  const needle = (text || '').trim().toUpperCase();
+  if (!needle) return 0;
+  let n = 0;
+  setState((s) => {
+    let rules = s.rules;
+    if (addRuleToo && patch.head) {
+      rules = [{ id: uid(), pattern: text.trim(), head: patch.head, scope: patch.scope ?? null }, ...rules.filter((r) => (r.pattern || '').toUpperCase() !== needle)];
+    }
+    const transactions = s.transactions.map((t) => {
+      if ((t.narration || '').toUpperCase().includes(needle)) {
+        n++;
+        return { ...t, ...patch, reviewed: true, autoTagged: false };
+      }
+      return t;
+    });
+    return { rules, transactions };
+  });
+  return n;
+}
+
 // Bulk-approve: mark many transactions reviewed in one state update.
 export function reviewTransactions(ids) {
   const set = new Set(ids);

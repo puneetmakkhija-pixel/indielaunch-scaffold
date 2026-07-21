@@ -11,6 +11,7 @@ import Analysis from './pages/Analysis.jsx';
 import LoansCards from './pages/LoansCards.jsx';
 import Save from './pages/Save.jsx';
 import Monthly from './pages/Monthly.jsx';
+import Assistant from './components/Assistant.jsx';
 
 export default function App() {
   const state = useStore();
@@ -55,6 +56,7 @@ export default function App() {
             <Route path="/accounts" element={<Accounts />} />
           </Routes>
         </main>
+        <Assistant />
       </div>
     </HashRouter>
   );
