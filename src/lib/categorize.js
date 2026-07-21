@@ -2,6 +2,7 @@
 // Scope can always be overridden per-transaction.
 export const HEADS = [
   { name: 'Investor Tranche In', scope: 'business', credit: true },
+  { name: 'Return to Investor', scope: 'business' },
   { name: 'Salary', scope: 'personal', credit: true },
   { name: 'DSA Commission', scope: 'business', credit: true },
   { name: 'Sub-DSA Investment', scope: 'business' },
@@ -130,10 +131,13 @@ export const DEFAULT_RULES = [
 // Apply the first matching rule to a transaction. Rules may be scoped to one
 // account via rule.accountId (e.g. the same payer can mean salary in one
 // account and commission in another). Returns {head, scope} or null.
-export function applyRules(narration, rules, accountId = null) {
+// Rules may also be scoped to one direction via rule.direction (e.g. money
+// TO a counterparty is a return, money FROM them is a receipt).
+export function applyRules(narration, rules, accountId = null, direction = null) {
   const hay = (narration || '').toUpperCase();
   for (const r of rules) {
     if (r.accountId && r.accountId !== accountId) continue;
+    if (r.direction && direction && r.direction !== direction) continue;
     if (r.pattern && hay.includes(r.pattern.toUpperCase())) {
       return { head: r.head, scope: r.scope ?? defaultScopeForHead(r.head), ruleId: r.id };
     }

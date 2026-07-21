@@ -119,7 +119,7 @@ export function importTransactions(accountId, parsed, source) {
         continue;
       }
       existing.add(h);
-      const match = applyRules(t.narration, s.rules, t.accountId);
+      const match = applyRules(t.narration, s.rules, t.accountId, t.direction);
       if (match) {
         t.head = match.head;
         t.scope = match.scope;
@@ -194,7 +194,7 @@ export function tagTransaction(id, { head, scope, rememberPattern }) {
     const retagged = rememberPattern
       ? transactions.map((t) => {
           if (t.reviewed || t.head) return t;
-          const m = applyRules(t.narration, rules, t.accountId);
+          const m = applyRules(t.narration, rules, t.accountId, t.direction);
           return m ? { ...t, head: m.head, scope: m.scope, autoTagged: true } : t;
         })
       : transactions;
@@ -283,7 +283,7 @@ export function importAll(json) {
     // self transfers so both legs of own-account moves land as internal.
     next.transactions = (next.transactions || []).map((t) => {
       if (t.head) return t;
-      const m = applyRules(t.narration, next.rules, t.accountId);
+      const m = applyRules(t.narration, next.rules, t.accountId, t.direction);
       return m ? { ...t, head: m.head, scope: m.scope, autoTagged: true } : t;
     });
     const { patches } = findSelfTransferPairs(next.transactions, next.accounts, next.profile);

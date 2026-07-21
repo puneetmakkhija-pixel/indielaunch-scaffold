@@ -67,7 +67,7 @@ const munshi = {
     csv: parseCsvStatement,
     alerts: parseAlerts,
     whatsapp: parseWhatsAppChat,
-    rules: (narration, accountId) => applyRules(narration, S().rules, accountId),
+    rules: (narration, accountId, direction) => applyRules(narration, S().rules, accountId, direction),
     merchant: guessMerchantToken,
   },
 

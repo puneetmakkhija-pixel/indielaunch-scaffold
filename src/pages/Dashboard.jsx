@@ -28,7 +28,7 @@ export default function Dashboard() {
   const credits = txns.filter((t) => t.direction === 'credit');
   const sum = (arr) => arr.reduce((a, t) => a + t.amount, 0);
 
-  const bizSpend = sum(debits.filter((t) => t.scope === 'business' && t.head !== 'Manish Transfer' && !isInternalHead(t.head)));
+  const bizSpend = sum(debits.filter((t) => t.scope === 'business' && t.head !== 'Manish Transfer' && !t.manishSide && !isInternalHead(t.head)));
   const perSpend = sum(debits.filter((t) => t.scope === 'personal'));
   const unscoped = sum(debits.filter((t) => !t.scope && !isInternalHead(t.head)));
   const trancheIn = sum(credits.filter((t) => t.head === 'Investor Tranche In'));
