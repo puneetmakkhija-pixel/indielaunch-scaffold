@@ -72,7 +72,7 @@ export default function Monthly() {
     .filter((t) => {
       const n = t.narration || '';
       if (excludeRe && excludeRe.test(n)) return false;
-      return t.head === 'Manish Transfer' || (partnerRe && partnerRe.test(n));
+      return t.head === 'Manish Transfer' || t.manishSide || (partnerRe && partnerRe.test(n));
     })
     .sort((a, b) => (a.date < b.date ? -1 : 1));
   const manishOut = sum(manishTxns.filter((t) => t.direction === 'debit'));
