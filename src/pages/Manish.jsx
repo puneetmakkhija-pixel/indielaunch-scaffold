@@ -78,6 +78,7 @@ export default function Manish() {
   const sideBank = bankRows.filter((t) => inMonth(t.date));
   const sideChat = state.manishClaims.filter((c) => inMonth(c.date)).sort((a, b) => ((a.date || '') < (b.date || '') ? -1 : 1));
   const accountsById = useMemo(() => Object.fromEntries(state.accounts.map((a) => [a.id, a])), [state.accounts]);
+  const txnSource = useMemo(() => Object.fromEntries(state.transactions.map((t) => [t.id, t.source])), [state.transactions]);
   const paneStyle = { maxHeight: 460, overflowY: 'auto', border: '1px solid var(--border, rgba(128,128,128,0.25))', borderRadius: 8, padding: '0.5rem' };
 
   return (
@@ -128,6 +129,8 @@ export default function Manish() {
                     <span style={{ whiteSpace: 'nowrap' }}>{t.date}</span>
                     <span className="muted" style={{ overflowWrap: 'anywhere' }}>
                       {t.direction === 'debit' ? <span className="pill debit">→ to him</span> : <span className="pill credit">← in</span>}{' '}
+                      {t.source === 'proof' && <span className="pill cash" title="Not from a bank statement — added from a payment screenshot Manish sent, visually verified">🖼 screenshot-added</span>}{' '}
+                      {t.source === 'manual' && <span className="pill untagged" title="Entered by hand">manual</span>}{' '}
                       {(accountsById[t.accountId]?.bank || '')} · {(t.narration || '').slice(0, 54)}
                     </span>
                     <span className="num" style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{inr(t.amount)}</span>
@@ -239,7 +242,11 @@ export default function Manish() {
                     <td style={{ whiteSpace: 'nowrap' }}>{e.date}</td>
                     <td style={{ whiteSpace: 'nowrap' }}>{e.direction === 'to_manish' ? '→ to Manish' : '← from Manish'}</td>
                     <td>
-                      {e.kind === 'bank' && <span className="pill credit">bank</span>}
+                      {e.kind === 'bank' && (txnSource[e.id] === 'proof'
+                        ? <span className="pill cash" title="Added from a verified payment screenshot, not a bank statement">🖼 screenshot</span>
+                        : txnSource[e.id] === 'manual'
+                          ? <span className="pill untagged">manual</span>
+                          : <span className="pill credit">bank</span>)}
                       {e.kind === 'cash' && <span className="pill cash">cash</span>}
                       {e.kind === 'claim' && <span className="pill untagged">unmatched</span>}
                     </td>
