@@ -103,6 +103,21 @@ test('each credit is consumed at most once', () => {
   assert.equal(pairs.length, 1);
 });
 
+test('shared 12-digit reference pairs internal legs even with no name evidence', () => {
+  const debit = T({ date: '2026-04-01', amount: 20000, narration: 'UPI to account ref 609163483645' });
+  const credit = T({ accountId: 'kotak', direction: 'credit', date: '2026-04-01', amount: 20000, narration: 'UPI/609163483645/CR/XYZ/HDFC/998' });
+  const { pairs } = run([debit, credit]);
+  assert.equal(pairs.length, 1);
+});
+
+test('same amount + different people + no shared ref must NOT pair', () => {
+  // Regression: real coincidence — payment to Subhash vs credit from Satish.
+  const debit = T({ date: '2026-02-11', amount: 50000, narration: 'IMPS/P2A/604222717188/HDFC/SUBHASH KUMAR' });
+  const credit = T({ accountId: 'kotak', direction: 'credit', date: '2026-02-11', amount: 50000, narration: 'UPI credit-SATISH ARAVIND-satish@ybl ref 998877665544' });
+  const { pairs } = run([debit, credit]);
+  assert.equal(pairs.length, 0);
+});
+
 test('with an empty profile only SWEEP/SELF and account-number evidence works', () => {
   const debit = T({ date: '2026-07-01', amount: 15000, narration: 'IMPS to account ending 2222' });
   const credit = T({ accountId: 'kotak', direction: 'credit', date: '2026-07-01', amount: 15000, narration: 'IMPS from a/c 1111' });
