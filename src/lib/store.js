@@ -15,6 +15,11 @@ const emptyState = {
   rules: DEFAULT_RULES,
   tranches: [],
   manishClaims: [],
+  // Full WhatsApp chat with the ledger partner, for the date-synced
+  // reconciliation view. Local-only (backup), never in the repo.
+  chatMessages: [],
+  // Agreed opening balance for the partner ledger: { date, youOwe, note }.
+  manishAnchor: null,
   loans: [],
   emails: [],
   // profile powers narration matching without names in code:
