@@ -108,3 +108,22 @@ test('suggestTag: untagged transaction inherits head of similar tagged one', () 
   const none = suggestTag(T({ date: '2026-07-01', narration: 'IMPS-RANDOM PERSON-99' }), tagged);
   assert.equal(none, null);
 });
+
+test('manishLedger anchor: settlement from opening balance + post-anchor flows', async () => {
+  const { manishLedger } = await import('../src/lib/reconcile.js');
+  const txns = [
+    // pre-anchor flows are superseded by the agreed balance, so ignored
+    { id: 'a', date: '2026-03-01', direction: 'debit', amount: 500000, head: 'Return to Investor', manishSide: true },
+    // post-anchor: you paid him (reduces debt) and received from him (increases debt)
+    { id: 'b', date: '2026-05-01', direction: 'debit', amount: 300000, head: 'Manish Transfer' },
+    { id: 'c', date: '2026-06-02', direction: 'credit', amount: 625000, head: 'Manish Transfer', manishSide: true },
+  ];
+  const anchor = { date: '2026-04-13', youOwe: 2934850 };
+  const l = manishLedger([], txns, anchor);
+  assert.equal(l.postSent, 300000);
+  assert.equal(l.postReceived, 625000);
+  assert.equal(l.youOwe, 2934850 - 300000 + 625000); // 3259850
+  // noisy claims must not move the settlement figure
+  const withClaims = manishLedger([{ id: 'x', date: '2026-05-05', direction: 'to_manish', amount: 2636400, mode: 'unknown' }], txns, anchor);
+  assert.equal(withClaims.youOwe, l.youOwe);
+});

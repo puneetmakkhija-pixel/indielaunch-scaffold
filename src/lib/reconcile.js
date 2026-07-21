@@ -36,7 +36,13 @@ export function autoMatchClaims(claims, transactions, windowDays = 4) {
 }
 
 // Net position: positive = Manish owes you (you sent more than you received).
-export function manishLedger(claims, transactions) {
+//
+// An optional anchor { date, youOwe } fixes an agreed opening balance (e.g. a
+// signed hisab). When present, the settlement figure `youOwe` is computed from
+// that balance plus only the flows AFTER the anchor date, so pre-anchor detail
+// is superseded by the agreed number instead of double-counted. In that model
+// money you send Manish reduces what you owe; money from his side increases it.
+export function manishLedger(claims, transactions, anchor = null) {
   // manishSide marks rows that belong to the Manish ledger even when tagged
   // under another head (e.g. verified client credits tagged Investor Tranche In).
   const bankTxns = transactions.filter((t) => t.head === 'Manish Transfer' || t.manishSide);
@@ -77,5 +83,23 @@ export function manishLedger(claims, transactions) {
     });
   }
   entries.sort((a, b) => (a.date < b.date ? 1 : -1));
-  return { sent, received, net: sent - received, entries };
+
+  // Settlement figure from an agreed opening balance. Positive youOwe = you
+  // owe Manish; negative = Manish owes you.
+  let youOwe = null;
+  let postSent = 0;
+  let postReceived = 0;
+  if (anchor && anchor.date) {
+    // Settlement rests only on verified bank + proof transactions. The
+    // auto-parsed chat claims are shown as an unmatched paper trail but never
+    // drive the number (they double-count and mis-parse running totals).
+    for (const t of bankTxns) {
+      if (t.date <= anchor.date) continue;
+      if (t.direction === 'debit') postSent += t.amount;
+      else postReceived += t.amount;
+    }
+    youOwe = anchor.youOwe - postSent + postReceived;
+  }
+
+  return { sent, received, net: sent - received, youOwe, anchor, postSent, postReceived, entries };
 }
