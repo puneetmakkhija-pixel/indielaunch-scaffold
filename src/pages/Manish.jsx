@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import {
   useStore,
   addManishClaims,
@@ -106,6 +106,26 @@ export default function Manish() {
   }, [bankAll, chatAll, activeReconMonth]);
   const attachIcon = (a) => (a === 'photo' ? '📷 screenshot' : a === 'audio' ? '🎤 voice note' : a === 'doc' ? '📄 file' : a === 'call' ? '📞 call' : a ? '📎 ' + a : '');
 
+  // Local media: point the app at your exported WhatsApp media folder once per
+  // session. Files never leave the browser — we only build in-memory object
+  // URLs keyed by filename, so referenced screenshots and voice notes render
+  // inline. Cleared on reload.
+  const [media, setMedia] = useState({});
+  const urlsRef = useRef([]);
+  function loadMedia(fileList) {
+    for (const u of urlsRef.current) URL.revokeObjectURL(u);
+    urlsRef.current = [];
+    const map = {};
+    for (const f of fileList) {
+      const url = URL.createObjectURL(f);
+      urlsRef.current.push(url);
+      map[f.name] = url;
+    }
+    setMedia(map);
+  }
+  useEffect(() => () => { for (const u of urlsRef.current) URL.revokeObjectURL(u); }, []);
+  const mediaCount = Object.keys(media).length;
+
   return (
     <div>
       <h1>Manish ledger</h1>
@@ -164,11 +184,20 @@ export default function Manish() {
             {reconMonths.map((m) => <option key={m} value={m}>{monthName(m)}</option>)}
           </select>
         </div>
-        <p className="muted" style={{ marginBottom: '0.75rem' }}>
+        <p className="muted" style={{ marginBottom: '0.5rem' }}>
           Every bank movement (all accounts except credit cards) beside the day's WhatsApp messages
           and screenshots — one row per date, the two sides always in sync. Page through month by
           month from January.
         </p>
+        <div className="row" style={{ marginBottom: '0.75rem', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <label className="secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '0.35rem 0.7rem', border: '1px solid var(--border, rgba(128,128,128,0.3))', borderRadius: 8, cursor: 'pointer', fontSize: '0.85rem' }}>
+            📎 Load WhatsApp media
+            <input type="file" multiple accept="image/*,audio/*" style={{ display: 'none' }} onChange={(e) => e.target.files.length && loadMedia(e.target.files)} />
+          </label>
+          {mediaCount > 0
+            ? <span className="pill credit">{mediaCount} media files loaded — screenshots &amp; voice notes now open inline</span>
+            : <span className="muted" style={{ fontSize: '0.82rem' }}>Export the chat <strong>with media</strong>, then pick those image/audio files here. They stay on your device — nothing is uploaded.</span>}
+        </div>
         {reconDays.length === 0 ? (
           <p className="muted">Nothing for this month. Restore a backup with chat + statements loaded.</p>
         ) : (
@@ -194,13 +223,27 @@ export default function Manish() {
                       ))}
                     </td>
                     <td>
-                      {day.chat.length === 0 ? <span className="muted">—</span> : day.chat.map((m, i) => (
-                        <div key={i} style={{ padding: '2px 0', fontSize: '0.83rem', overflowWrap: 'anywhere' }}>
-                          <span className="muted" style={{ fontWeight: 600 }}>{m.sender === 'me' ? 'You' : 'Manish'}:</span>{' '}
-                          {m.attach && <span className="pill cash">{attachIcon(m.attach)}</span>}{' '}
-                          {m.text}
-                        </div>
-                      ))}
+                      {day.chat.length === 0 ? <span className="muted">—</span> : day.chat.map((m, i) => {
+                        const url = m.file && media[m.file];
+                        return (
+                          <div key={i} style={{ padding: '2px 0', fontSize: '0.83rem', overflowWrap: 'anywhere' }}>
+                            <span className="muted" style={{ fontWeight: 600 }}>{m.sender === 'me' ? 'You' : 'Manish'}:</span>{' '}
+                            {m.attach && !url && <span className="pill cash" title={m.file || ''}>{attachIcon(m.attach)}</span>}{' '}
+                            {m.text}
+                            {url && m.attach === 'photo' && (
+                              <a href={url} target="_blank" rel="noreferrer" style={{ display: 'block', marginTop: 3 }}>
+                                <img src={url} alt="screenshot" style={{ maxWidth: 160, maxHeight: 200, borderRadius: 6, border: '1px solid rgba(128,128,128,0.25)' }} />
+                              </a>
+                            )}
+                            {url && m.attach === 'audio' && (
+                              <audio controls preload="none" src={url} style={{ display: 'block', marginTop: 3, width: '100%', maxWidth: 240, height: 32 }} />
+                            )}
+                            {url && (m.attach === 'video') && (
+                              <video controls preload="none" src={url} style={{ display: 'block', marginTop: 3, maxWidth: 200, borderRadius: 6 }} />
+                            )}
+                          </div>
+                        );
+                      })}
                     </td>
                   </tr>
                 ))}
