@@ -61,6 +61,25 @@ export default function Manish() {
   const unmatched = state.manishClaims.filter((c) => !c.matchedTxnId && c.mode !== 'cash');
   const cashClaims = state.manishClaims.filter((c) => c.mode === 'cash');
 
+  // Side-by-side reconciliation: bank rows on the left, chat claims on the right.
+  const bankRows = useMemo(
+    () =>
+      state.transactions
+        .filter((t) => t.head === 'Manish Transfer' || t.manishSide)
+        .sort((a, b) => (a.date < b.date ? -1 : 1)),
+    [state.transactions]
+  );
+  const sideMonths = useMemo(
+    () => [...new Set([...bankRows.map((t) => t.date.slice(0, 7)), ...state.manishClaims.map((c) => (c.date || '').slice(0, 7))])].filter(Boolean).sort().reverse(),
+    [bankRows, state.manishClaims]
+  );
+  const [sideMonth, setSideMonth] = useState('');
+  const inMonth = (dateStr) => !sideMonth || (dateStr || '').startsWith(sideMonth);
+  const sideBank = bankRows.filter((t) => inMonth(t.date));
+  const sideChat = state.manishClaims.filter((c) => inMonth(c.date)).sort((a, b) => ((a.date || '') < (b.date || '') ? -1 : 1));
+  const accountsById = useMemo(() => Object.fromEntries(state.accounts.map((a) => [a.id, a])), [state.accounts]);
+  const paneStyle = { maxHeight: 460, overflowY: 'auto', border: '1px solid var(--border, rgba(128,128,128,0.25))', borderRadius: 8, padding: '0.5rem' };
+
   return (
     <div>
       <h1>Manish ledger</h1>
@@ -82,6 +101,61 @@ export default function Manish() {
           <div className="label">Net position</div>
           <div className={'value ' + (ledger.net >= 0 ? 'pos' : 'neg')}>{inr(Math.abs(ledger.net))}</div>
           <div className="hint">{ledger.net >= 0 ? 'in Manish’s hands' : 'owed to Manish side'}</div>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="spread" style={{ marginBottom: '0.5rem' }}>
+          <h2 style={{ margin: 0 }}>Bank statement ⇄ WhatsApp chat</h2>
+          <select value={sideMonth} onChange={(e) => setSideMonth(e.target.value)}>
+            <option value="">All months</option>
+            {sideMonths.map((m) => <option key={m} value={m}>{m}</option>)}
+          </select>
+        </div>
+        <p className="muted" style={{ marginBottom: '0.75rem' }}>
+          The same period, two sources of truth — bank rows on the left, what you two wrote on
+          WhatsApp on the right. Line them up month by month.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
+          <div>
+            <h3 style={{ margin: '0 0 0.5rem' }}>🏦 Bank statement <span className="muted" style={{ fontWeight: 400 }}>({sideBank.length})</span></h3>
+            <div style={paneStyle}>
+              {sideBank.length === 0 ? (
+                <p className="muted">No bank rows for this period.</p>
+              ) : (
+                sideBank.map((t) => (
+                  <div key={t.id} style={{ display: 'grid', gridTemplateColumns: '84px 1fr 100px', gap: 8, padding: '4px 2px', borderBottom: '1px solid rgba(128,128,128,0.12)', fontSize: '0.85rem', alignItems: 'baseline' }}>
+                    <span style={{ whiteSpace: 'nowrap' }}>{t.date}</span>
+                    <span className="muted" style={{ overflowWrap: 'anywhere' }}>
+                      {t.direction === 'debit' ? <span className="pill debit">→ to him</span> : <span className="pill credit">← in</span>}{' '}
+                      {(accountsById[t.accountId]?.bank || '')} · {(t.narration || '').slice(0, 54)}
+                    </span>
+                    <span className="num" style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{inr(t.amount)}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+          <div>
+            <h3 style={{ margin: '0 0 0.5rem' }}>💬 WhatsApp chat <span className="muted" style={{ fontWeight: 400 }}>({sideChat.length})</span></h3>
+            <div style={paneStyle}>
+              {sideChat.length === 0 ? (
+                <p className="muted">No chat claims for this period — import the chat export below.</p>
+              ) : (
+                sideChat.map((c) => (
+                  <div key={c.id} style={{ display: 'grid', gridTemplateColumns: '84px 1fr 100px', gap: 8, padding: '4px 2px', borderBottom: '1px solid rgba(128,128,128,0.12)', fontSize: '0.85rem', alignItems: 'baseline' }}>
+                    <span style={{ whiteSpace: 'nowrap' }}>{c.date || '—'}</span>
+                    <span className="muted" style={{ overflowWrap: 'anywhere' }}>
+                      {c.direction === 'to_manish' ? <span className="pill debit">→ gave</span> : <span className="pill credit">← got</span>}{' '}
+                      {c.matchedTxnId ? <span className="pill credit">matched</span> : c.mode === 'cash' ? <span className="pill cash">cash</span> : <span className="pill untagged">unmatched</span>}{' '}
+                      {(c.text || '').slice(0, 58)}
+                    </span>
+                    <span className="num" style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{inr(c.amount)}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
