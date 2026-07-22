@@ -29,6 +29,7 @@ export const HEADS = [
   { name: 'Entertainment & OTT', scope: 'personal' },
   { name: 'Medical & Health', scope: 'personal' },
   { name: 'Household (Wife)', scope: 'personal' },
+  { name: 'Education (Kids)', scope: 'personal' },
   { name: 'Family & Gifts', scope: 'personal' },
   { name: 'EMI & Loans', scope: 'personal' },
   { name: 'Insurance', scope: 'personal' },
